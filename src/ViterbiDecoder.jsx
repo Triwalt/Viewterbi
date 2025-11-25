@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { ChevronRight, ChevronLeft, RotateCcw, Play, Info, Settings } from 'lucide-react';
+import { ChevronRight, ChevronLeft, RotateCcw, Play, Info, Settings, Github } from 'lucide-react';
 
 const ViterbiDecoder = () => {
   // --- 配置状态 ---
@@ -32,24 +32,12 @@ const ViterbiDecoder = () => {
     
     for (let i = 0; i < input.length; i++) {
       const bit = parseInt(input[i]);
-      // 临时构建完整的移位寄存器值: bit + state
-      // 注意：这里假设 bit 进入 MSB，state 是低位 (或者反之，需保持一致性)
-      // 这里采用常见模型: state = (u_n-1, ... u_n-K+1). 新bit u_n
-      // 寄存器全貌 (u_n, u_n-1, u_n-2)
-      
-      // 为了计算输出，我们需要把当前输入和寄存器状态结合
-      // 假设 poly "111" 对应 (u_n, u_n-1, u_n-2)
-      // 将 state 左移1位，加上 input bit 放在最低位，构成 K 位的窗口
-      // 但为了和状态转移匹配，我们通常定义 state 为旧的记忆
-      
-      // 让我们构建一个临时值来做模2加法
       const fullReg = (bit << (K - 1)) | state;
       
       let symbol = "";
       for (let g of gens) {
         let sum = 0;
         const gVal = parseInt(g, 2);
-        // 遍历生成多项式的每一位
         for (let b = 0; b < K; b++) {
           if ((gVal >> b) & 1) {
             sum ^= (fullReg >> b) & 1;
@@ -59,21 +47,7 @@ const ViterbiDecoder = () => {
       }
       output += symbol;
       
-      // 更新状态: 丢弃最高位 (最旧的位), 左移, 补入新位
-      // 状态定义为存储前 K-1 位
-      // 比如 K=3, 状态是 2位. 
-      // 新状态 = (原状态 << 1) & mask | input
-      // 但通常 trellis 定义是 input 把旧值挤出去
-      // 让我们使用文档中的风格: State = (u_{n-1}, u_{n-2}). Next State = (u_n, u_{n-1})
-      // 即：input 变成新状态的高位 (或低位，取决于约定)。
-      // 这里采用：NextState = (input * 2) + (CurrentState >> 1) ? 不对
-      // 采用标准移位寄存器：NextState = ((CurrentState << 1) & mask) | input 
-      // 且此时 state 存的是 (u_{n-1}, u_{n-2}) 这种形式
-      // 等等，如果 State=00, in=1 -> Next=10 (文档 Example 5.1)
-      // 这意味着 Input 进入了高位。
-      // Current 00 (u_n-1=0, u_n-2=0). Input u_n=1.
-      // Next 10 (u_n=1, u_n-1=0). 
-      // 所以 update rule: nextState = (input << (K-2)) | (state >> 1)
+      // 状态更新逻辑: 00 -(1)-> 10
       state = (bit << (K - 2)) | (state >> 1); 
     }
     return output;
@@ -96,7 +70,6 @@ const ViterbiDecoder = () => {
       symbol += sum;
     }
     
-    // 状态更新逻辑需与 Example 5.1 一致: 00 -(1)-> 10
     const nextState = (inputBit << (K - 2)) | (currentState >> 1);
     
     return { output: symbol, nextState };
@@ -117,15 +90,15 @@ const ViterbiDecoder = () => {
   const trellisData = useMemo(() => {
     if (!receivedVector) return [];
     
-    const n = receivedVector.length / 2; // 总时间步数 (假设码率1/2)
-    const layers = []; // 每一层存储所有状态的信息
+    const n = receivedVector.length / 2; // 总时间步数
+    const layers = []; 
     
     // 初始化 t=0
     let currentLayer = Array(numStates).fill(null).map((_, i) => ({
       state: i,
-      pm: i === 0 ? 0 : Infinity, // 起始状态必须是0
-      path: [], // 存历史路径
-      survivorBranch: null // 存当前最优的前驱分支信息
+      pm: i === 0 ? 0 : Infinity, 
+      path: [], 
+      survivorBranch: null 
     }));
     
     layers.push(currentLayer);
@@ -138,49 +111,43 @@ const ViterbiDecoder = () => {
         state: i,
         pm: Infinity,
         path: [],
-        incomingBranches: [] // 记录所有进入该节点的线，用于可视化剪枝
+        incomingBranches: [] 
       }));
 
       // 遍历前一时刻的所有状态
       for (let prevState = 0; prevState < numStates; prevState++) {
         if (prevLayer[prevState].pm === Infinity) continue;
 
-        // 尝试输入 0 和 1
         for (let input = 0; input <= 1; input++) {
           const { output, nextState } = getTransition(prevState, input);
           const bm = hammingDistance(receivedSymbol, output);
           const newPm = prevLayer[prevState].pm + bm;
 
-          // 记录这条分支信息
           const branchInfo = {
             fromState: prevState,
             input: input,
             output: output,
             bm: bm,
             totalPm: newPm,
-            isSurvivor: false // 稍后标记
+            isSurvivor: false 
           };
           
           nextLayer[nextState].incomingBranches.push(branchInfo);
         }
       }
 
-      // ACS (Add-Compare-Select) 操作
+      // ACS 操作
       for (let s = 0; s < numStates; s++) {
         const node = nextLayer[s];
         if (node.incomingBranches.length === 0) continue;
 
-        // 找到最小PM
         node.incomingBranches.sort((a, b) => a.totalPm - b.totalPm);
         const bestBranch = node.incomingBranches[0];
         
-        // 标记幸存路径
         bestBranch.isSurvivor = true;
-        // 如果有PM相等的情况，通常随机选或选索引小的，这里sort默认稳定或取第一个即可
         
         node.pm = bestBranch.totalPm;
         node.survivorBranch = bestBranch;
-        // 继承路径历史
         node.path = [...prevLayer[bestBranch.fromState].path, {
           state: s,
           input: bestBranch.input,
@@ -212,9 +179,7 @@ const ViterbiDecoder = () => {
   // --- 回溯：获取最终路径 ---
   const finalPath = useMemo(() => {
     if (!trellisData || trellisData.length === 0) return [];
-    // 假设最后回到状态0 (归零位)，或者取最后一层PM最小的
     const lastLayer = trellisData[trellisData.length - 1];
-    // 寻找PM最小的状态作为终点
     let minPm = Infinity;
     let endState = 0;
     lastLayer.forEach(node => {
@@ -224,11 +189,7 @@ const ViterbiDecoder = () => {
       }
     });
     
-    // 获取该节点记录的完整路径
-    // 路径格式: [{state: 2, input: 1, output: "11"}, ...]
-    // 为了方便画图，我们需要把它转换成坐标序列
     const pathHistory = lastLayer[endState].path;
-    // 加上起始点
     return [{state: 0, time: 0}, ...pathHistory.map((p, i) => ({state: p.state, time: i + 1}))];
   }, [trellisData]);
 
@@ -328,30 +289,34 @@ const ViterbiDecoder = () => {
 
               {/* 绘制连接线 (Edges) */}
               {trellisData.map((layer, t) => {
-                // 只绘制到当前步
                 if (t >= currentStep) return null;
-                if (t >= trellisData.length - 1) return null; // 最后一层没有出边
+                if (t >= trellisData.length - 1) return null; 
 
                 const nextLayer = trellisData[t+1];
                 return nextLayer.map(targetNode => {
-                  return targetNode.incomingBranches.map((branch, bIdx) => {
+                  // 关键修改：对分支进行排序渲染
+                  // 将非幸存者（Deleted）放在数组前面，幸存者（Survivor）放在后面
+                  const branchesToRender = [...targetNode.incomingBranches].sort((a, b) => {
+                    if (a.isSurvivor && !b.isSurvivor) return 1; 
+                    if (!a.isSurvivor && b.isSurvivor) return -1; 
+                    return 0;
+                  });
+
+                  return branchesToRender.map((branch) => {
                     const x1 = t * xSpacing + 60;
                     const y1 = branch.fromState * ySpacing + 40;
                     const x2 = (t + 1) * xSpacing + 60;
                     const y2 = targetNode.state * ySpacing + 40;
 
                     const isSurvivor = branch.isSurvivor;
-                    // 检查是否是最终回溯路径的一部分
                     const isFinalPath = (t + 1 === currentStep || currentStep === trellisData.length - 1) && 
                                         finalPath[t+1] && finalPath[t+1].state === targetNode.state && 
                                         finalPath[t] && finalPath[t].state === branch.fromState;
 
-                    // 如果该节点在当前步骤是存活的，但不是本轮ACS的胜者，它就是被剪枝的
-                    // 注意：如果 targetNode.pm 是 Infinity，说明这个节点根本不可达，不画线
                     if (layer[branch.fromState].pm === Infinity) return null;
 
                     return (
-                      <g key={`edge-${t}-${targetNode.state}-${bIdx}`}>
+                      <g key={`edge-${t}-${branch.fromState}-${targetNode.state}`}>
                         <line 
                           x1={x1} y1={y1} x2={x2} y2={y2}
                           stroke={isFinalPath && currentStep === trellisData.length - 1 ? "#10B981" : (isSurvivor ? "#3B82F6" : "#EF4444")}
@@ -359,7 +324,6 @@ const ViterbiDecoder = () => {
                           strokeDasharray={isSurvivor ? "0" : "4 2"}
                           opacity={isSurvivor ? 1 : 0.3}
                         />
-                        {/* 在线中间显示输出 bits */}
                         <text x={(x1+x2)/2} y={(y1+y2)/2 - 5} fontSize="10" fill={isSurvivor ? "#333" : "#ccc"} textAnchor="middle">
                           {branch.output}
                         </text>
@@ -371,7 +335,6 @@ const ViterbiDecoder = () => {
 
               {/* 绘制节点 (Nodes) */}
               {trellisData.map((layer, t) => {
-                // 只渲染到当前步
                 if (t > currentStep) return null;
 
                 return layer.map((node, s) => {
@@ -380,7 +343,6 @@ const ViterbiDecoder = () => {
                   const isReachable = node.pm !== Infinity;
                   const isCurrentHead = t === currentStep;
                   
-                  // 检查是否是回溯路径上的点
                   const isOnFinalPath = isCurrentHead && currentStep === trellisData.length - 1 && finalPath[t] && finalPath[t].state === node.state;
 
                   return (
@@ -406,7 +368,7 @@ const ViterbiDecoder = () => {
           {/* 图例 */}
           <div className="flex gap-4 mt-2 text-sm justify-center border-t pt-2">
             <div className="flex items-center gap-1"><div className="w-4 h-0.5 bg-blue-500"></div> 幸存路径 (Survivor)</div>
-            <div className="flex items-center gap-1"><div className="w-4 h-0.5 bg-red-400 border-dashed border-t border-red-400"></div> 剪除路径 (Pruned)</div>
+            <div className="flex items-center gap-1"><div className="w-4 h-0.5 bg-red-400 border-dashed border-t border-red-400 opacity-30"></div> 剪除路径 (Pruned)</div>
             <div className="flex items-center gap-1"><div className="w-4 h-0.5 bg-green-500"></div> 最终回溯结果</div>
             <div className="flex items-center gap-1"><div className="w-4 h-4 rounded-full border border-blue-500 flex items-center justify-center text-[8px]">PM</div> 累积路径度量</div>
           </div>
@@ -456,12 +418,9 @@ const ViterbiDecoder = () => {
               <div className="text-xs text-gray-600">解码输出序列:</div>
               <div className="font-mono text-lg break-all text-green-700">
                 {finalPath.slice(1).map(p => {
-                  // 通过回溯路径重建输入bit
-                  // 实际上我们在trellisData里存了input历史，直接拿最后一个节点的path即可
                   return ""; 
                 })}
                 {(() => {
-                   // 找到终点
                    let minPm = Infinity;
                    let endState = 0;
                    trellisData[currentStep].forEach(n => { if(n.pm < minPm) { minPm = n.pm; endState = n.state; }});
@@ -479,6 +438,22 @@ const ViterbiDecoder = () => {
           )}
         </div>
       </div>
+
+      {/* 页脚 */}
+      <footer className="mt-12 pb-6 text-center text-gray-500 text-sm border-t border-gray-200 pt-6">
+        <div className="flex flex-col items-center gap-2">
+          <p>Interactive Viterbi Algorithm Visualizer made by Triwalt @SYSU</p>
+          <a 
+            href="https://github.com/Triwalt/Viewterbi" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 hover:text-blue-600 transition-colors"
+          >
+            <Github size={16} />
+            <span>View Source on GitHub</span>
+          </a>
+        </div>
+      </footer>
     </div>
   );
 };
