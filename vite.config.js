@@ -6,5 +6,5 @@ export default defineConfig({
   plugins: [react()],
   // ⚠️ 注意：这里的 '/viterbi-viz/' 必须换成您在 GitHub 上的仓库名称
   // 例如您的仓库是 https://github.com/user/my-app，这里就填 '/my-app/'
-  base: 'https://github.com/Triwalt/Viewterbi', 
+  base: 'https://triwalt.github.io/Viewterbi/', 
 })
