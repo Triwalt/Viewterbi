@@ -5,6 +5,8 @@ import './App.css'
 // src/App.jsx
 import HardViterbi from './pages/HardViterbi'
 import SoftViterbi from './SoftViterbi'
+import ConvEncoder from './pages/ConvEncoder'
+import BCJRDecoder from './pages/BCJRDecoder'
 
 function App() {
   const [mode, setMode] = useState('hard')
@@ -17,7 +19,7 @@ function App() {
             <img src={reactLogo} className="w-6 h-6" alt="React logo" />
             <span className="font-bold text-blue-800">Viewterbi</span>
           </div>
-          <div className="flex gap-2 text-sm">
+          <div className="flex gap-2 text-sm flex-wrap justify-end">
             <button
               className={`px-3 py-1 rounded-full border text-xs md:text-sm ${mode === 'hard' ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'}`}
               onClick={() => setMode('hard')}
@@ -30,6 +32,18 @@ function App() {
             >
               Soft Viterbi
             </button>
+            <button
+              className={`px-3 py-1 rounded-full border text-xs md:text-sm ${mode === 'encoder' ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'}`}
+              onClick={() => setMode('encoder')}
+            >
+              Conv Encoder
+            </button>
+            <button
+              className={`px-3 py-1 rounded-full border text-xs md:text-sm ${mode === 'bcjr' ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'}`}
+              onClick={() => setMode('bcjr')}
+            >
+              BCJR Decoder
+            </button>
           </div>
         </div>
       </div>
@@ -40,6 +54,12 @@ function App() {
         )}
         {mode === 'soft' && (
           <SoftViterbi />
+        )}
+        {mode === 'encoder' && (
+          <ConvEncoder />
+        )}
+        {mode === 'bcjr' && (
+          <BCJRDecoder />
         )}
       </div>
     </div>
