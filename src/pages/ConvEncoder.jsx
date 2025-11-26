@@ -445,7 +445,7 @@ const ConvEncoder = () => {
                 </div>
                 <div className="flex justify-between items-center py-2 border-b border-gray-100">
                   <span className="text-sm text-slate-600">{t('convEncoder.inputBit')}</span>
-                  <span className="font-mono font-bold text-blue-600">{currentStep < steps.length ? steps[currentStep].input : 'Done'}</span>
+                  <span className="font-mono font-bold text-blue-600">{currentStep < steps.length ? steps[currentStep].input : t('common.done')}</span>
                 </div>
                 <div className="flex justify-between items-center py-2 border-b border-gray-100">
                   <span className="text-sm text-slate-600">{t('convEncoder.outputBits')}</span>

@@ -17,6 +17,7 @@ const BCJRDecoder = () => {
   // --- Configuration ---
   const [generators, setGenerators] = useState(["111", "101"]);
   const [inputVector, setInputVector] = useState("110100");
+  const [receivedVector, setReceivedVector] = useState("");
   
   // Adaptive K (matching Viterbi pages)
   const K = useMemo(() => Math.min(6, Math.max(2, ...generators.map(g => g.length))), [generators]);
@@ -32,33 +33,16 @@ const BCJRDecoder = () => {
   const sanitizeBits = (str) => str.replace(/[^01]/g, '');
 
   const result = useMemo(() => {
-    const info = sanitizeBits(inputVector || "");
-    const bits = info.split('').filter((ch) => ch === '0' || ch === '1');
+    if (!receivedVector || receivedVector.length === 0) {
+      return { n: 0, alpha: [], beta: [], llrs: [], decisions: [] };
+    }
 
-    // Encode first to get "received" data (assuming ideal channel for demo)
-    const encode = (input, gens) => {
-      let state = 0;
-      let output = '';
-      for (let i = 0; i < input.length; i++) {
-        const bit = parseInt(input[i]);
-        if (Number.isNaN(bit)) continue;
-        const fullReg = (bit << (K - 1)) | state;
-        let symbol = '';
-        for (let g of gens) {
-          const gVal = parseInt(g || '0', 2);
-          let sum = 0;
-          for (let b = 0; b < K; b++) {
-            if ((gVal >> b) & 1) {
-              sum ^= (fullReg >> b) & 1;
-            }
-          }
-          symbol += sum;
-        }
-        output += symbol;
-        state = (bit << (K - 2)) | (state >> 1);
-      }
-      return output;
-    };
+    const symbolsPerBit = generators.length;
+    // Ensure receivedVector length is a multiple of symbolsPerBit
+    if (receivedVector.length % symbolsPerBit !== 0) {
+      console.warn(`Received vector length (${receivedVector.length}) is not a multiple of symbols per bit (${symbolsPerBit})`);
+      return { n: 0, alpha: [], beta: [], llrs: [], decisions: [] };
+    }
 
     const getTransition = (currentState, inputBit) => {
       const fullReg = (inputBit << (K - 1)) | currentState;
@@ -77,13 +61,16 @@ const BCJRDecoder = () => {
       return { output: symbol, nextState };
     };
 
-    const encoded = encode(info, generators);
-    const n = encoded.length / 2;
+    const n = Math.floor(receivedVector.length / symbolsPerBit);
+    
+    if (n === 0) {
+      return { n: 0, alpha: [], beta: [], llrs: [], decisions: [] };
+    }
 
     // BPSK: 0->+1, 1->-1
     const r = [];
-    for (let i = 0; i < encoded.length; i++) {
-      r.push(encoded[i] === '0' ? 1 : -1);
+    for (let i = 0; i < receivedVector.length; i++) {
+      r.push(receivedVector[i] === '0' ? 1 : -1);
     }
 
     // Gamma
@@ -92,15 +79,22 @@ const BCJRDecoder = () => {
     );
 
     for (let t = 0; t < n; t++) {
-      const r0 = r[2 * t];
-      const r1 = r[2 * t + 1];
       for (let prevState = 0; prevState < numStates; prevState++) {
         for (let input = 0; input <= 1; input++) {
           const { output } = getTransition(prevState, input);
-          const s0 = output[0] === '0' ? 1 : -1;
-          const s1 = output[1] === '0' ? 1 : -1;
-          const dist = (r0 - s0) * (r0 - s0) + (r1 - s1) * (r1 - s1);
-          gamma[t][prevState][input] = -dist;
+          let dist = 0;
+          for (let i = 0; i < symbolsPerBit; i++) {
+            const idx = t * symbolsPerBit + i;
+            if (idx >= r.length) {
+              console.error(`Index ${idx} out of bounds for r.length ${r.length}`);
+              continue;
+            }
+            const rSym = r[idx];
+            const sSym = output[i] === '0' ? 1 : -1;
+            dist += (rSym - sSym) * (rSym - sSym);
+          }
+          // Scale gamma to avoid numerical issues (optional: divide by 2*sigma^2, here sigma=1)
+          gamma[t][prevState][input] = -dist / 2;
         }
       }
     }
@@ -123,7 +117,10 @@ const BCJRDecoder = () => {
 
     // Beta (Backward)
     const beta = Array.from({ length: n + 1 }, () => Array(numStates).fill(LOG_ZERO));
-    beta[n][0] = 0; // Terminated
+    // Initialize all terminal states equally (unknown termination state)
+    for (let s = 0; s < numStates; s++) {
+      beta[n][s] = 0; // Log(1/numStates) normalized to 0
+    }
 
     for (let t = n - 1; t >= 0; t--) {
       for (let prevState = 0; prevState < numStates; prevState++) {
@@ -156,13 +153,39 @@ const BCJRDecoder = () => {
       }
       const llr = num1 - num0;
       llrs.push(llr);
-      decisions.push(llr >= 0 ? 0 : 1);
+      decisions.push(llr >= 0 ? 1 : 0);
     }
 
-    return { n, encoded, alpha, beta, llrs, decisions };
-  }, [inputVector, generators, K, numStates]);
+    return { n, alpha, beta, llrs, decisions };
+  }, [receivedVector, generators, K, numStates]);
 
-  const { n, encoded, alpha, beta, llrs, decisions } = result;
+  // Auto-update receivedVector when input or generators change
+  useEffect(() => {
+    const info = sanitizeBits(inputVector || "");
+    let output = '';
+    let s = 0;
+    for (let i = 0; i < info.length; i++) {
+      const bit = parseInt(info[i]);
+      if (Number.isNaN(bit)) continue;
+      const fullReg = (bit << (K - 1)) | s;
+      let symbol = '';
+      for (let g of generators) {
+        const gVal = parseInt(g || '0', 2);
+        let sum = 0;
+        for (let b = 0; b < K; b++) {
+          if ((gVal >> b) & 1) {
+            sum ^= (fullReg >> b) & 1;
+          }
+        }
+        symbol += sum;
+      }
+      output += symbol;
+      s = (bit << (K - 2)) | (s >> 1);
+    }
+    setReceivedVector(output);
+  }, [inputVector, generators, K]);
+
+  const { n, alpha, beta, llrs, decisions } = result;
 
   // --- Animation Loop ---
   useEffect(() => {
@@ -229,6 +252,15 @@ const BCJRDecoder = () => {
     const width = Math.max(600, (n + 1) * xSpacing + 100);
     const height = numStates * ySpacing + 60;
 
+    // Safety check: don't render if arrays are not ready
+    if (!alpha || alpha.length === 0 || !beta || beta.length === 0) {
+      return (
+        <div className="flex items-center justify-center h-48 text-slate-400 text-sm">
+          {t('hardViterbi.inputVector')} {t('hardViterbi.receivedVector')}
+        </div>
+      );
+    }
+
     return (
       <div className="overflow-x-auto pb-4">
         <svg width={width} height={height} className="mx-auto">
@@ -243,23 +275,23 @@ const BCJRDecoder = () => {
                 let color = '#3B82F6'; // Default blue
                 let showValue = false;
 
-                if (phase === 'forward' && t <= currentStep) {
+                if (phase === 'forward' && t <= currentStep && alpha[t] && alpha[t][s] !== undefined) {
                   val = alpha[t][s];
                   isActive = val > LOG_ZERO;
                   color = '#3B82F6'; // Blue for forward
                   showValue = isActive;
-                } else if (phase === 'backward' && t >= currentStep) {
+                } else if (phase === 'backward' && t >= currentStep && beta[t] && beta[t][s] !== undefined) {
                   val = beta[t][s];
                   isActive = val > LOG_ZERO;
                   color = '#EF4444'; // Red for backward
                   showValue = isActive;
-                } else if (phase === 'llr') {
+                } else if (phase === 'llr' && alpha[t] && beta[t]) {
                   // In LLR phase, show both alpha and beta if available
-                  const alphaVal = alpha[t][s];
-                  const betaVal = beta[t][s];
+                  const alphaVal = alpha[t]?.[s];
+                  const betaVal = beta[t]?.[s];
 
                   // Show combined value (alpha + beta in log domain)
-                  if (alphaVal > LOG_ZERO && betaVal > LOG_ZERO) {
+                  if (alphaVal !== undefined && betaVal !== undefined && alphaVal > LOG_ZERO && betaVal > LOG_ZERO) {
                     val = alphaVal + betaVal;
                     isActive = true;
                     // Use purple to indicate combined alpha+beta
@@ -429,6 +461,19 @@ const BCJRDecoder = () => {
                     }}
                   />
                   <p className="text-xs text-slate-400 mt-1">{t('hardViterbi.inputVectorTip')}</p>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">{t('hardViterbi.receivedVector')}</label>
+                  <input
+                    className="w-full border border-gray-300 rounded-md px-3 py-2 font-mono text-sm tracking-widest focus:ring-2 focus:ring-purple-500 outline-none bg-yellow-50"
+                    value={receivedVector}
+                    onChange={(e) => {
+                      setReceivedVector(sanitizeBits(e.target.value));
+                      handleReset();
+                    }}
+                  />
+                  <p className="text-xs text-red-500 mt-1">{t('hardViterbi.receivedVectorTip')}</p>
                 </div>
               </div>
             </div>
