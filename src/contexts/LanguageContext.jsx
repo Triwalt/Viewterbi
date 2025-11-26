@@ -219,11 +219,11 @@ const translations = {
   // Conv Encoder
   convEncoder: {
     title: {
-      zh: 'Convolutional Encoder',
+      zh: '卷积码编码器',
       en: 'Convolutional Encoder'
     },
     subtitle: {
-      zh: 'Visualize the encoding process with shift registers and trellis diagrams.',
+      zh: '通过移位寄存器和网格图可视化编码过程',
       en: 'Visualize the encoding process with shift registers and trellis diagrams.'
     },
     theoryTitle: {
@@ -463,8 +463,48 @@ const translations = {
   // Common
   common: {
     done: {
-      zh: 'Done',
+      zh: '完成',
       en: 'Done'
+    }
+  },
+
+  // Footer
+  footer: {
+    about: {
+      zh: '关于项目',
+      en: 'About'
+    },
+    description: {
+      zh: '这是一个用于可视化卷积码编码和维特比译码过程的交互式教学工具，帮助理解信道编码理论。',
+      en: 'An interactive educational tool for visualizing convolutional encoding and Viterbi decoding processes to understand channel coding theory.'
+    },
+    links: {
+      zh: '相关链接',
+      en: 'Links'
+    },
+    github: {
+      zh: 'GitHub 仓库',
+      en: 'GitHub Repository'
+    },
+    docs: {
+      zh: '维特比算法文档',
+      en: 'Viterbi Algorithm Docs'
+    },
+    tech: {
+      zh: '技术栈',
+      en: 'Tech Stack'
+    },
+    madeWith: {
+      zh: '使用',
+      en: 'Made with'
+    },
+    forEducation: {
+      zh: '开发，用于教学目的',
+      en: 'for educational purposes'
+    },
+    rights: {
+      zh: '保留所有权利。',
+      en: 'All rights reserved.'
     }
   }
 };
