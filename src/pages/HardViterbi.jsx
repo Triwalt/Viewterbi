@@ -1,8 +1,11 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { ChevronRight, ChevronLeft, RotateCcw, Play, Pause, Info, Settings } from 'lucide-react';
 import hardFlow from '../assets/hard.png';
+import { useLanguage } from '../contexts/LanguageContext';
 
 const ViterbiDecoder = () => {
+  const { t } = useLanguage();
+
   // --- Configuration State ---
   const [generators, setGenerators] = useState(["111", "101"]);
   const [inputVector, setInputVector] = useState("110100");
@@ -200,9 +203,9 @@ const ViterbiDecoder = () => {
           <div>
             <h1 className="text-3xl font-bold text-slate-900 flex items-center gap-3">
               <Settings className="w-8 h-8 text-blue-600" />
-              硬判决维特比译码 (Hard Decision Viterbi)
+              {t('hardViterbi.title')}
             </h1>
-            <p className="text-slate-500 mt-1">使用汉明距离进行最优路径译码的可视化演示</p>
+            <p className="text-slate-500 mt-1">{t('hardViterbi.subtitle')}</p>
           </div>
 
           {/* Controls */}
@@ -227,17 +230,13 @@ const ViterbiDecoder = () => {
         <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-6 shadow-sm">
           <h2 className="text-lg font-bold text-slate-800 mb-3 flex items-center gap-2">
             <Info className="w-5 h-5 text-blue-600" />
-            硬判决维特比译码原理
+            {t('hardViterbi.theoryTitle')}
           </h2>
           <div className="space-y-3 text-sm text-slate-700 leading-relaxed">
-            <p>
-              <strong>硬判决维特比算法</strong>是一种基于动态规划的最优译码算法。接收端先将信道输出进行0/1硬判决，然后使用<strong>汉明距离</strong>作为分支度量（接收比特与理想输出比特不同的个数）。
-            </p>
-            <p>
-              算法在每个时间步对所有可能的分支执行<strong>"加-比-选"(ACS, Add-Compare-Select)</strong>操作：累加路径度量、比较不同路径、选择累积汉明距离最小的幸存路径。最终通过回溯得到整体汉明距离最小的路径作为译码结果。
-            </p>
+            <p dangerouslySetInnerHTML={{ __html: t('hardViterbi.theoryP1') }} />
+            <p dangerouslySetInnerHTML={{ __html: t('hardViterbi.theoryP2') }} />
             <p className="bg-white/70 border-l-4 border-blue-400 pl-3 py-2 italic">
-              💡 提示：尝试修改接收向量中的1-2个比特，观察维特比算法如何通过最优路径选择实现纠错。
+              {t('hardViterbi.theoryTip')}
             </p>
           </div>
         </div>
@@ -248,20 +247,20 @@ const ViterbiDecoder = () => {
           {/* Left Column: Configuration */}
           <div className="space-y-6">
             <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-200">
-              <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">Configuration</h2>
+              <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">{t('hardViterbi.configuration')}</h2>
 
               <div className="space-y-4">
                 {/* K Display */}
                 <div className="bg-blue-50 border border-blue-200 rounded-md p-3">
                   <div className="flex justify-between items-center">
-                    <span className="text-sm font-medium text-slate-700">约束长度 (K)</span>
+                    <span className="text-sm font-medium text-slate-700">{t('hardViterbi.constraintLength')}</span>
                     <span className="font-mono font-bold text-blue-600 text-lg">{K}</span>
                   </div>
-                  <p className="text-xs text-slate-500 mt-1">自动从生成多项式推导 (最大6)</p>
+                  <p className="text-xs text-slate-500 mt-1">{t('hardViterbi.autoDerived')}</p>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">生成多项式 (二进制, 最大6位)</label>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">{t('hardViterbi.generators')}</label>
                   <div className="flex gap-2">
                     <input
                       className="w-24 border border-gray-300 rounded-md px-3 py-2 font-mono text-sm focus:ring-2 focus:ring-blue-500 outline-none"
@@ -282,11 +281,11 @@ const ViterbiDecoder = () => {
                       }}
                     />
                   </div>
-                  <p className="text-xs text-slate-400 mt-1">默认 (7,5)₈ = (111,101)₂</p>
+                  <p className="text-xs text-slate-400 mt-1">{t('hardViterbi.generatorsDefault')}</p>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">原始输入向量</label>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">{t('hardViterbi.inputVector')}</label>
                   <input
                     className="w-full border border-gray-300 rounded-md px-3 py-2 font-mono text-sm tracking-widest focus:ring-2 focus:ring-blue-500 outline-none"
                     value={inputVector}
@@ -295,11 +294,11 @@ const ViterbiDecoder = () => {
                       setInputVector(val);
                     }}
                   />
-                  <p className="text-xs text-slate-400 mt-1">建议末尾添加00以归零状态</p>
+                  <p className="text-xs text-slate-400 mt-1">{t('hardViterbi.inputVectorTip')}</p>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">接收向量 (可编辑模拟误码)</label>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">{t('hardViterbi.receivedVector')}</label>
                   <input
                     className="w-full border border-gray-300 rounded-md px-3 py-2 font-mono text-sm tracking-widest focus:ring-2 focus:ring-blue-500 outline-none bg-yellow-50"
                     value={receivedVector}
@@ -308,22 +307,22 @@ const ViterbiDecoder = () => {
                       setReceivedVector(val);
                     }}
                   />
-                  <p className="text-xs text-red-500 mt-1">提示：修改1-2位观察纠错</p>
+                  <p className="text-xs text-red-500 mt-1">{t('hardViterbi.receivedVectorTip')}</p>
                 </div>
               </div>
             </div>
 
             {/* Current State */}
             <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-200">
-              <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">Current State</h2>
+              <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">{t('hardViterbi.currentState')}</h2>
               <div className="space-y-3">
                 <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                  <span className="text-sm text-slate-600">时间步 (t)</span>
+                  <span className="text-sm text-slate-600">{t('hardViterbi.timeStep')}</span>
                   <span className="font-mono font-bold text-slate-900">{currentStep}</span>
                 </div>
                 {currentStep > 0 && currentStep <= trellisData.length - 1 && (
                   <div className="bg-blue-50 p-3 rounded border border-blue-100">
-                    <div className="text-sm text-gray-500">当前接收符号</div>
+                    <div className="text-sm text-gray-500">{t('hardViterbi.receivedSymbol')}</div>
                     <div className="text-2xl font-mono font-bold text-blue-700 tracking-widest">
                       {receivedVector.slice((currentStep - 1) * 2, currentStep * 2)}
                     </div>
@@ -331,8 +330,8 @@ const ViterbiDecoder = () => {
                 )}
                 {currentStep === trellisData.length - 1 && trellisData.length > 0 && (
                   <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded">
-                    <div className="font-bold text-green-800 mb-2">译码完成!</div>
-                    <div className="text-xs text-gray-600">解码输出序列:</div>
+                    <div className="font-bold text-green-800 mb-2">{t('hardViterbi.decodingComplete')}</div>
+                    <div className="text-xs text-gray-600">{t('hardViterbi.decodedOutput')}</div>
                     <div className="font-mono text-lg break-all text-green-700">
                       {(() => {
                         let minPm = Infinity;
@@ -353,7 +352,7 @@ const ViterbiDecoder = () => {
 
             {/* Trellis Diagram */}
             <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-200">
-              <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">Viterbi Trellis Diagram</h2>
+              <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">{t('hardViterbi.trellisDiagram')}</h2>
               <div className="overflow-x-auto pb-4">
                 <svg width={svgWidth} height={svgHeight} className="mx-auto">
                   <defs>
@@ -452,31 +451,31 @@ const ViterbiDecoder = () => {
 
               {/* Legend */}
               <div className="flex gap-4 mt-4 text-sm justify-center border-t pt-4">
-                <div className="flex items-center gap-1"><div className="w-4 h-0.5 bg-blue-500"></div> 幸存路径</div>
-                <div className="flex items-center gap-1"><div className="w-4 h-0.5 bg-red-400 border-dashed border-t border-red-400 opacity-30"></div> 剪除路径</div>
-                <div className="flex items-center gap-1"><div className="w-4 h-0.5 bg-green-500"></div> 最终结果</div>
-                <div className="flex items-center gap-1"><div className="w-4 h-4 rounded-full border border-blue-500 flex items-center justify-center text-[8px]">PM</div> 路径度量</div>
+                <div className="flex items-center gap-1"><div className="w-4 h-0.5 bg-blue-500"></div> {t('hardViterbi.survivorPath')}</div>
+                <div className="flex items-center gap-1"><div className="w-4 h-0.5 bg-red-400 border-dashed border-t border-red-400 opacity-30"></div> {t('hardViterbi.prunedPath')}</div>
+                <div className="flex items-center gap-1"><div className="w-4 h-0.5 bg-green-500"></div> {t('hardViterbi.finalResult')}</div>
+                <div className="flex items-center gap-1"><div className="w-4 h-4 rounded-full border border-blue-500 flex items-center justify-center text-[8px]">PM</div> {t('hardViterbi.pathMetric')}</div>
               </div>
             </div>
 
             {/* ACS Details */}
             {currentStep > 0 && currentStep <= trellisData.length - 1 && (
               <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-200">
-                <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">ACS (加-比-选) 详情</h2>
+                <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">{t('hardViterbi.acsDetails')}</h2>
                 <div className="space-y-2 max-h-96 overflow-y-auto">
                   {trellisData[currentStep].map((node) => {
                     if (node.incomingBranches.length === 0) return null;
                     return (
                       <div key={node.state} className="border rounded-lg p-3 text-xs bg-gray-50">
-                        <div className="font-bold mb-2 text-slate-700">目标状态 {node.state.toString(2).padStart(K - 1, '0')}</div>
+                        <div className="font-bold mb-2 text-slate-700">{t('hardViterbi.targetState')} {node.state.toString(2).padStart(K - 1, '0')}</div>
                         {node.incomingBranches.map((br, idx) => (
                           <div key={idx} className={`flex justify-between mb-1 p-2 rounded ${br.isSurvivor ? 'bg-blue-100 text-blue-800 font-bold' : 'text-gray-400 line-through'}`}>
-                            <span>源:{br.fromState.toString(2).padStart(K - 1, '0')} → 输出:{br.output}</span>
+                            <span>{t('hardViterbi.source')}:{br.fromState.toString(2).padStart(K - 1, '0')} → {t('hardViterbi.output')}:{br.output}</span>
                             <span>PM:{br.totalPm - br.bm} + BM:{br.bm} = {br.totalPm}</span>
                           </div>
                         ))}
                         {node.incomingBranches.length > 0 && (
-                          <div className="text-right text-blue-600 mt-1 font-bold">选择 PM: {node.pm}</div>
+                          <div className="text-right text-blue-600 mt-1 font-bold">{t('hardViterbi.selected')}: {node.pm}</div>
                         )}
                       </div>
                     );
@@ -491,12 +490,12 @@ const ViterbiDecoder = () => {
         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
           <h2 className="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
             <Info className="w-6 h-6 text-blue-600" />
-            硬判决维特比译码流程
+            {t('hardViterbi.flowTitle')}
           </h2>
           <div className="flex justify-center">
             <img
               src={hardFlow}
-              alt="硬判决维特比译码流程示意图"
+              alt={t('hardViterbi.flowAlt')}
               className="w-full max-w-5xl h-auto rounded-md shadow border border-gray-200"
             />
           </div>

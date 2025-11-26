@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { Settings, Play, Pause, RotateCcw, ChevronRight, ChevronLeft, Info, ArrowRight, ArrowLeft, Calculator } from 'lucide-react';
+import { useLanguage } from '../contexts/LanguageContext';
 
 const LOG_ZERO = -1e9;
 
@@ -11,10 +12,14 @@ const logAdd = (a, b) => {
 };
 
 const BCJRDecoder = () => {
+  const { t } = useLanguage();
+  
   // --- Configuration ---
   const [generators, setGenerators] = useState(["111", "101"]);
   const [inputVector, setInputVector] = useState("110100");
-  const K = 3;
+  
+  // Adaptive K (matching Viterbi pages)
+  const K = useMemo(() => Math.min(6, Math.max(2, ...generators.map(g => g.length))), [generators]);
   const numStates = Math.pow(2, K - 1);
 
   // --- Animation State ---
@@ -298,7 +303,7 @@ const BCJRDecoder = () => {
 
           {/* Phase indicator */}
           <text x={width / 2} y={height - 10} textAnchor="middle" className="text-xs fill-slate-400 font-semibold">
-            {phase === 'forward' ? '→ Forward (Alpha)' : phase === 'backward' ? '← Backward (Beta)' : '⊕ LLR Calculation (Alpha + Beta)'}
+            {phase === 'forward' ? t('bcjr.forward') : phase === 'backward' ? t('bcjr.backward') : t('bcjr.llrCalc')}
           </text>
 
         </svg>
@@ -315,9 +320,9 @@ const BCJRDecoder = () => {
           <div>
             <h1 className="text-3xl font-bold text-slate-900 flex items-center gap-3">
               <Settings className="w-8 h-8 text-blue-600" />
-              BCJR Decoder
+              {t('bcjr.title')}
             </h1>
-            <p className="text-slate-500 mt-1">MAP / Log-MAP Decoding Visualization</p>
+            <p className="text-slate-500 mt-1">{t('bcjr.subtitle')}</p>
           </div>
 
           {/* Controls */}
@@ -338,18 +343,34 @@ const BCJRDecoder = () => {
           </div>
         </div>
 
+        {/* Theory Overview */}
+        <div className="bg-gradient-to-br from-purple-50 to-indigo-50 border border-purple-200 rounded-xl p-6 shadow-sm">
+          <h2 className="text-lg font-bold text-slate-800 mb-3 flex items-center gap-2">
+            <Info className="w-5 h-5 text-purple-600" />
+            {t('bcjr.theoryTitle')}
+          </h2>
+          <div className="space-y-3 text-sm text-slate-700 leading-relaxed">
+            <p>{t('bcjr.theoryP1')}</p>
+            <p>{t('bcjr.theoryP2')}</p>
+            <p>{t('bcjr.theoryP3')}</p>
+            <p className="bg-white/70 border-l-4 border-purple-400 pl-3 py-2 italic">
+              {t('bcjr.theoryTip')}
+            </p>
+          </div>
+        </div>
+
         {/* Phase Indicator */}
         <div className="flex justify-center gap-4">
           <div className={`px-4 py-2 rounded-full text-sm font-bold transition-colors ${phase === 'forward' ? 'bg-blue-100 text-blue-700' : 'text-slate-400'}`}>
-            1. Forward (Alpha)
+            {t('bcjr.phase1')}
           </div>
           <ArrowRight className="text-slate-300" />
           <div className={`px-4 py-2 rounded-full text-sm font-bold transition-colors ${phase === 'backward' ? 'bg-red-100 text-red-700' : 'text-slate-400'}`}>
-            2. Backward (Beta)
+            {t('bcjr.phase2')}
           </div>
           <ArrowRight className="text-slate-300" />
           <div className={`px-4 py-2 rounded-full text-sm font-bold transition-colors ${phase === 'llr' ? 'bg-purple-100 text-purple-700' : 'text-slate-400'}`}>
-            3. LLR Calculation
+            {t('bcjr.phase3')}
           </div>
         </div>
 
@@ -359,37 +380,74 @@ const BCJRDecoder = () => {
           {/* Left Column: Settings */}
           <div className="space-y-6">
             <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-200">
-              <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">Configuration</h2>
+              <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">{t('bcjr.configuration')}</h2>
               <div className="space-y-4">
+                {/* K Display */}
+                <div className="bg-purple-50 border border-purple-200 rounded-md p-3">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm font-medium text-slate-700">{t('hardViterbi.constraintLength')}</span>
+                    <span className="font-mono font-bold text-purple-600 text-lg">{K}</span>
+                  </div>
+                  <p className="text-xs text-slate-500 mt-1">{t('hardViterbi.autoDerived')}</p>
+                </div>
+
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Input Sequence</label>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">{t('hardViterbi.generators')}</label>
+                  <div className="flex gap-2">
+                    <input
+                      className="w-24 border border-gray-300 rounded-md px-3 py-2 font-mono text-sm focus:ring-2 focus:ring-purple-500 outline-none"
+                      value={generators[0]}
+                      maxLength={6}
+                      onChange={(e) => {
+                        const val = e.target.value.replace(/[^01]/g, '').slice(0, 6);
+                        setGenerators([val, generators[1]]);
+                        handleReset();
+                      }}
+                    />
+                    <input
+                      className="w-24 border border-gray-300 rounded-md px-3 py-2 font-mono text-sm focus:ring-2 focus:ring-purple-500 outline-none"
+                      value={generators[1]}
+                      maxLength={6}
+                      onChange={(e) => {
+                        const val = e.target.value.replace(/[^01]/g, '').slice(0, 6);
+                        setGenerators([generators[0], val]);
+                        handleReset();
+                      }}
+                    />
+                  </div>
+                  <p className="text-xs text-slate-400 mt-1">{t('hardViterbi.generatorsDefault')}</p>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">{t('hardViterbi.inputVector')}</label>
                   <input
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 font-mono text-sm tracking-widest focus:ring-2 focus:ring-blue-500 outline-none"
+                    className="w-full border border-gray-300 rounded-md px-3 py-2 font-mono text-sm tracking-widest focus:ring-2 focus:ring-purple-500 outline-none"
                     value={inputVector}
                     onChange={(e) => {
                       setInputVector(sanitizeBits(e.target.value));
                       handleReset();
                     }}
                   />
+                  <p className="text-xs text-slate-400 mt-1">{t('hardViterbi.inputVectorTip')}</p>
                 </div>
               </div>
             </div>
 
             <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-200">
-              <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">Current Step Data</h2>
+              <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">{t('bcjr.currentStepData')}</h2>
               <div className="space-y-2 font-mono text-sm">
                 <div className="flex justify-between">
-                  <span className="text-slate-500">Time (t)</span>
+                  <span className="text-slate-500">{t('bcjr.time')}</span>
                   <span>{currentStep}</span>
                 </div>
                 {phase === 'llr' && currentStep < n && (
                   <>
                     <div className="flex justify-between text-purple-600 font-bold">
-                      <span>LLR</span>
+                      <span>{t('bcjr.llr')}</span>
                       <span>{llrs[currentStep]?.toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span>Decision</span>
+                      <span>{t('bcjr.decision')}</span>
                       <span>{decisions[currentStep]}</span>
                     </div>
                   </>
@@ -401,14 +459,14 @@ const BCJRDecoder = () => {
           {/* Right Column: Visualization */}
           <div className="lg:col-span-2 space-y-6">
             <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-200">
-              <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">Trellis View</h2>
+              <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">{t('bcjr.trellisView')}</h2>
               <Trellis />
             </div>
 
             {/* LLR Chart (Only in LLR phase) */}
             {phase === 'llr' && (
               <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-200">
-                <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">LLR Results</h2>
+                <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">{t('bcjr.llrResults')}</h2>
                 <div className="relative h-48 border-b border-gray-200">
                   <div className="absolute inset-0 flex items-end justify-around gap-1 px-2">
                     {llrs.map((val, i) => {
@@ -423,8 +481,8 @@ const BCJRDecoder = () => {
                           <div className="text-xs text-slate-500 mt-1 font-mono">t{i}</div>
                           {/* Tooltip */}
                           <div className="absolute -top-8 opacity-0 group-hover:opacity-100 bg-slate-800 text-white text-xs px-2 py-1 rounded whitespace-nowrap transition-opacity pointer-events-none">
-                            LLR: {val.toFixed(2)}<br />
-                            Decision: {decisions[i]}
+                            {t('bcjr.llr')}: {val.toFixed(2)}<br />
+                            {t('bcjr.decision')}: {decisions[i]}
                           </div>
                         </div>
                       );
@@ -435,11 +493,11 @@ const BCJRDecoder = () => {
                 <div className="flex gap-4 mt-4 text-xs justify-center">
                   <div className="flex items-center gap-1">
                     <div className="w-3 h-3 bg-blue-500 rounded"></div>
-                    <span>LLR ≥ 0 (决策为1)</span>
+                    <span>{t('bcjr.llrPositive')}</span>
                   </div>
                   <div className="flex items-center gap-1">
                     <div className="w-3 h-3 bg-red-500 rounded"></div>
-                    <span>LLR &lt; 0 (决策为0)</span>
+                    <span>{t('bcjr.llrNegative')}</span>
                   </div>
                 </div>
               </div>

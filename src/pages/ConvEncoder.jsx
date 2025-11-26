@@ -1,7 +1,10 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { Settings, Play, Pause, RotateCcw, ChevronRight, Info } from 'lucide-react';
+import { useLanguage } from '../contexts/LanguageContext';
 
 const ConvEncoder = () => {
+  const { t } = useLanguage();
+  
   // --- Configuration State ---
   const [generators, setGenerators] = useState(["111", "101"]);
   const [inputVector, setInputVector] = useState("110100");
@@ -324,9 +327,9 @@ const ConvEncoder = () => {
           <div>
             <h1 className="text-3xl font-bold text-slate-900 flex items-center gap-3">
               <Settings className="w-8 h-8 text-blue-600" />
-              Convolutional Encoder
+              {t('convEncoder.title')}
             </h1>
-            <p className="text-slate-500 mt-1">Visualize the encoding process with shift registers and trellis diagrams.</p>
+            <p className="text-slate-500 mt-1">{t('convEncoder.subtitle')}</p>
           </div>
 
           {/* Controls */}
@@ -351,18 +354,12 @@ const ConvEncoder = () => {
         <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-6 shadow-sm">
           <h2 className="text-lg font-bold text-slate-800 mb-3 flex items-center gap-2">
             <Info className="w-5 h-5 text-blue-600" />
-            卷积码生成原理
+            {t('convEncoder.theoryTitle')}
           </h2>
           <div className="space-y-3 text-sm text-slate-700 leading-relaxed">
-            <p>
-              <strong>卷积码</strong>是一种前向纠错码，通过将输入比特流与生成多项式进行卷积运算来生成编码输出。与分组码不同，卷积码的编码输出不仅依赖于当前输入比特，还依赖于之前的 <strong>K-1</strong> 个输入比特（存储在移位寄存器中），其中 <strong>K</strong> 称为<strong>约束长度</strong>。
-            </p>
-            <p>
-              编码过程：每个输入比特进入移位寄存器后，根据<strong>生成多项式（Generator Polynomials）</strong>选择的抽头位置进行<strong>模2加法（XOR）</strong>运算。每个生成多项式对应一个输出比特，多个生成多项式产生多个输出，形成<strong>码率 1/n</strong> 的卷积码（1个输入比特生成n个输出比特）。
-            </p>
-            <p className="bg-white/70 border-l-4 border-blue-400 pl-3 py-2 italic">
-              💡 示例：对于生成多项式 <code className="bg-blue-100 px-1 rounded">G1=111</code> 和 <code className="bg-blue-100 px-1 rounded">G2=101</code>（K=3），当输入比特为1时，移位寄存器状态为[1,0,0]。G1在位置0,1,2都有抽头，输出为 1⊕0⊕0=1；G2在位置0,2有抽头，输出为 1⊕0=1。因此该时刻的编码输出为11。
-            </p>
+            <p>{t('convEncoder.theoryP1')}</p>
+            <p>{t('convEncoder.theoryP2')}</p>
+            <p className="bg-white/70 border-l-4 border-blue-400 pl-3 py-2 italic" dangerouslySetInnerHTML={{ __html: t('convEncoder.theoryExample') }} />
           </div>
         </div>
 
@@ -372,20 +369,20 @@ const ConvEncoder = () => {
           {/* Left Column: Settings & Info */}
           <div className="space-y-6">
             <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-200">
-              <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">Configuration</h2>
+              <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">{t('hardViterbi.configuration')}</h2>
 
               <div className="space-y-4">
                 {/* K is now auto-derived, display it */}
                 <div className="bg-blue-50 border border-blue-200 rounded-md p-3">
                   <div className="flex justify-between items-center">
-                    <span className="text-sm font-medium text-slate-700">Constraint Length (K)</span>
+                    <span className="text-sm font-medium text-slate-700">{t('hardViterbi.constraintLength')}</span>
                     <span className="font-mono font-bold text-blue-600 text-lg">{K}</span>
                   </div>
-                  <p className="text-xs text-slate-500 mt-1">Auto-derived from generators (max 6)</p>
+                  <p className="text-xs text-slate-500 mt-1">{t('hardViterbi.autoDerived')}</p>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Generators (Binary, Max 6 bits)</label>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">{t('hardViterbi.generators')}</label>
                   <div className="flex gap-2 flex-wrap">
                     {generators.map((g, i) => (
                       <input
@@ -425,7 +422,7 @@ const ConvEncoder = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Input Sequence</label>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">{t('convEncoder.inputSequence')}</label>
                   <input
                     className="w-full border border-gray-300 rounded-md px-3 py-2 font-mono text-sm tracking-widest focus:ring-2 focus:ring-blue-500 outline-none"
                     value={inputVector}
@@ -434,28 +431,28 @@ const ConvEncoder = () => {
                       handleReset();
                     }}
                   />
-                  <p className="text-xs text-slate-400 mt-1">Append '0'.repeat(K-1) to flush.</p>
+                  <p className="text-xs text-slate-400 mt-1">{t('convEncoder.inputSequenceTip')}</p>
                 </div>
               </div>
             </div>
 
             <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-200">
-              <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">Current State</h2>
+              <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">{t('hardViterbi.currentState')}</h2>
               <div className="space-y-3">
                 <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                  <span className="text-sm text-slate-600">Time Step (t)</span>
+                  <span className="text-sm text-slate-600">{t('hardViterbi.timeStep')}</span>
                   <span className="font-mono font-bold text-slate-900">{currentStep}</span>
                 </div>
                 <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                  <span className="text-sm text-slate-600">Input Bit</span>
+                  <span className="text-sm text-slate-600">{t('convEncoder.inputBit')}</span>
                   <span className="font-mono font-bold text-blue-600">{currentStep < steps.length ? steps[currentStep].input : 'Done'}</span>
                 </div>
                 <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                  <span className="text-sm text-slate-600">Output Bits</span>
+                  <span className="text-sm text-slate-600">{t('convEncoder.outputBits')}</span>
                   <span className="font-mono font-bold text-purple-600">{currentStep > 0 ? steps[currentStep - 1].outBits : '-'}</span>
                 </div>
                 <div className="flex justify-between items-center py-2">
-                  <span className="text-sm text-slate-600">Encoded Sequence</span>
+                  <span className="text-sm text-slate-600">{t('convEncoder.encodedSequence')}</span>
                 </div>
                 <div className="bg-slate-50 p-2 rounded border border-slate-200 font-mono text-xs break-all text-slate-500">
                   {encoded.substring(0, currentStep * generators.length)}
@@ -473,21 +470,21 @@ const ConvEncoder = () => {
 
             {/* Trellis Diagram */}
             <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-200">
-              <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">Trellis Path</h2>
+              <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">{t('convEncoder.trellisPath')}</h2>
               <Trellis />
             </div>
 
             {/* Step Table */}
             <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-              <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">Encoding Steps</h2>
+              <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">{t('convEncoder.encodingSteps')}</h2>
               <div className="overflow-x-auto max-h-60">
                 <table className="min-w-full text-sm text-left">
                   <thead className="bg-gray-50 text-gray-500 font-medium">
                     <tr>
                       <th className="px-4 py-2">t</th>
-                      <th className="px-4 py-2">Input</th>
-                      <th className="px-4 py-2">State</th>
-                      <th className="px-4 py-2">Output</th>
+                      <th className="px-4 py-2">{t('convEncoder.inputBit')}</th>
+                      <th className="px-4 py-2">{t('convEncoder.state')}</th>
+                      <th className="px-4 py-2">{t('convEncoder.outputBits')}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100">
@@ -511,18 +508,18 @@ const ConvEncoder = () => {
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
           <h2 className="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
             <Info className="w-6 h-6 text-blue-600" />
-            最佳生成多项式参考表
+            {t('convEncoder.optimalGenerators')}
           </h2>
 
           <div className="overflow-x-auto mb-6">
             <table className="min-w-full text-sm border-collapse">
               <thead>
                 <tr className="bg-slate-100 border-b-2 border-slate-300">
-                  <th className="px-4 py-3 text-left font-semibold text-slate-700">约束长度 K</th>
-                  <th className="px-4 py-3 text-left font-semibold text-slate-700">码率</th>
-                  <th className="px-4 py-3 text-left font-semibold text-slate-700">生成多项式（二进制）</th>
-                  <th className="px-4 py-3 text-left font-semibold text-slate-700">生成多项式（八进制）</th>
-                  <th className="px-4 py-3 text-left font-semibold text-slate-700">自由距离 dfree</th>
+                  <th className="px-4 py-3 text-left font-semibold text-slate-700">{t('hardViterbi.constraintLength')}</th>
+                  <th className="px-4 py-3 text-left font-semibold text-slate-700">{t('convEncoder.codeRate')}</th>
+                  <th className="px-4 py-3 text-left font-semibold text-slate-700">{t('convEncoder.generatorsBinary')}</th>
+                  <th className="px-4 py-3 text-left font-semibold text-slate-700">{t('convEncoder.generatorsOctal')}</th>
+                  <th className="px-4 py-3 text-left font-semibold text-slate-700">{t('convEncoder.freeDistance')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
@@ -581,19 +578,19 @@ const ConvEncoder = () => {
 
           <div className="space-y-4">
             <div>
-              <h3 className="font-bold text-slate-800 mb-2">生成多项式抽头选取原则</h3>
+              <h3 className="font-bold text-slate-800 mb-2">{t('convEncoder.tapSelectionTitle')}</h3>
               <ul className="list-disc list-inside space-y-2 text-sm text-slate-700 pl-2">
                 <li>
-                  <strong>最大化自由距离（dfree）：</strong>选择能够产生最大自由距离的生成多项式组合。自由距离是任意两条不同编码路径之间的最小汉明距离，更大的自由距离意味着更强的纠错能力。
+                  <strong>{t('convEncoder.tapP1Title')}</strong>{t('convEncoder.tapP1')}
                 </li>
                 <li>
-                  <strong>确保首尾抽头：</strong>生成多项式的最高位（MSB）和最低位（LSB）通常都应为1，即形如 <code className="bg-slate-100 px-1 rounded">1xxx...x1</code>。这确保了编码器的记忆长度完全利用。
+                  <strong>{t('convEncoder.tapP2Title')}</strong>{t('convEncoder.tapP2')}
                 </li>
                 <li>
-                  <strong>避免公因子：</strong>多个生成多项式不应有公共因子，否则会降低码的有效约束长度，削弱纠错性能。
+                  <strong>{t('convEncoder.tapP3Title')}</strong>{t('convEncoder.tapP3')}
                 </li>
                 <li>
-                  <strong>平衡汉明重量：</strong>生成多项式中1的个数（汉明重量）应适中。过少的抽头会降低编码复杂度但可能减弱纠错能力；过多的抽头会增加硬件复杂度。
+                  <strong>{t('convEncoder.tapP4Title')}</strong>{t('convEncoder.tapP4')}
                 </li>
               </ul>
             </div>
@@ -601,26 +598,26 @@ const ConvEncoder = () => {
             <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
               <h3 className="font-bold text-slate-800 mb-2 flex items-center gap-2">
                 <span className="text-amber-600">💡</span>
-                抽头选择对性能的影响
+                {t('convEncoder.impactTitle')}
               </h3>
               <ul className="list-disc list-inside space-y-2 text-sm text-slate-700 pl-2">
                 <li>
-                  <strong>纠错能力：</strong>生成多项式的选择直接影响自由距离dfree，进而决定了卷积码的纠错能力。在相同约束长度下，最佳生成多项式可使纠错能力提升显著。
+                  <strong>{t('convEncoder.impactP1Title')}</strong>{t('convEncoder.impactP1')}
                 </li>
                 <li>
-                  <strong>译码复杂度：</strong>约束长度K越大，Viterbi译码的状态数（2^(K-1)）指数增长，硬件复杂度和功耗也随之增加。实际应用需权衡性能与复杂度。
+                  <strong>{t('convEncoder.impactP2Title')}</strong>{t('convEncoder.impactP2')}
                 </li>
                 <li>
-                  <strong>延迟：</strong>更大的K意味着更长的译码延迟，因为译码器需要等待更多比特才能做出可靠判决。实时通信系统需要考虑这一因素。
+                  <strong>{t('convEncoder.impactP3Title')}</strong>{t('convEncoder.impactP3')}
                 </li>
                 <li>
-                  <strong>误码平层：</strong>不合理的生成多项式选择可能导致在高信噪比下误码率无法进一步下降（误码平层现象），因此工程中通常采用经过理论验证的最佳生成多项式。
+                  <strong>{t('convEncoder.impactP4Title')}</strong>{t('convEncoder.impactP4')}
                 </li>
               </ul>
             </div>
 
             <div className="text-xs text-slate-500 italic mt-4 pt-4 border-t border-slate-200">
-              参考标准：上表中的最佳生成多项式来源于学术研究和工程实践，被广泛应用于NASA深空通信、卫星通信、移动通信（如GSM）等领域。
+              {t('convEncoder.reference')}
             </div>
           </div>
         </div>
