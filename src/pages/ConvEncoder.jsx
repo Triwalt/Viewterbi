@@ -332,8 +332,8 @@ const ConvEncoder = () => {
             <p className="text-slate-500 dark:text-slate-400 mt-1">{t('convEncoder.subtitle')}</p>
           </div>
 
-          {/* Controls */}
-          <div className="flex items-center gap-2 bg-white dark:bg-gray-800 p-2 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+          {/* Controls - Desktop only */}
+          <div className="hidden md:flex items-center gap-2 bg-white dark:bg-gray-800 p-2 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
             <button onClick={handleStepBack} disabled={currentStep === 0} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md disabled:opacity-50 dark:text-white">
               <ChevronRight className="w-5 h-5 rotate-180" />
             </button>
@@ -437,23 +437,40 @@ const ConvEncoder = () => {
               </div>
             </div>
 
-            <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-200">
-              <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">{t('hardViterbi.currentState')}</h2>
+            {/* Controls - Mobile only */}
+            <div className="md:hidden flex justify-center items-center gap-2 bg-white dark:bg-gray-800 p-3 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+              <button onClick={handleStepBack} disabled={currentStep === 0} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md disabled:opacity-50 dark:text-white">
+                <ChevronRight className="w-5 h-5 rotate-180" />
+              </button>
+              <button onClick={handlePlayPause} className="p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors">
+                {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
+              </button>
+              <button onClick={handleStepForward} disabled={currentStep === steps.length} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md disabled:opacity-50 dark:text-white">
+                <ChevronRight className="w-5 h-5" />
+              </button>
+              <div className="w-px h-6 bg-gray-300 dark:bg-gray-600 mx-1" />
+              <button onClick={handleReset} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md text-slate-600 dark:text-slate-300">
+                <RotateCcw className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="bg-white dark:bg-gray-800 p-5 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+              <h2 className="text-sm font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-4">{t('hardViterbi.currentState')}</h2>
               <div className="space-y-3">
-                <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                  <span className="text-sm text-slate-600">{t('hardViterbi.timeStep')}</span>
-                  <span className="font-mono font-bold text-slate-900">{currentStep}</span>
+                <div className="flex justify-between items-center py-2 border-b border-gray-100 dark:border-gray-700">
+                  <span className="text-sm text-slate-600 dark:text-slate-400">{t('hardViterbi.timeStep')}</span>
+                  <span className="font-mono font-bold text-slate-900 dark:text-slate-100">{currentStep}</span>
                 </div>
-                <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                  <span className="text-sm text-slate-600">{t('convEncoder.inputBit')}</span>
-                  <span className="font-mono font-bold text-blue-600">{currentStep < steps.length ? steps[currentStep].input : t('common.done')}</span>
+                <div className="flex justify-between items-center py-2 border-b border-gray-100 dark:border-gray-700">
+                  <span className="text-sm text-slate-600 dark:text-slate-400">{t('convEncoder.inputBit')}</span>
+                  <span className="font-mono font-bold text-blue-600 dark:text-blue-400">{currentStep < steps.length ? steps[currentStep].input : t('common.done')}</span>
                 </div>
-                <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                  <span className="text-sm text-slate-600">{t('convEncoder.outputBits')}</span>
-                  <span className="font-mono font-bold text-purple-600">{currentStep > 0 ? steps[currentStep - 1].outBits : '-'}</span>
+                <div className="flex justify-between items-center py-2 border-b border-gray-100 dark:border-gray-700">
+                  <span className="text-sm text-slate-600 dark:text-slate-400">{t('convEncoder.outputBits')}</span>
+                  <span className="font-mono font-bold text-purple-600 dark:text-purple-400">{currentStep > 0 ? steps[currentStep - 1].outBits : '-'}</span>
                 </div>
                 <div className="flex justify-between items-center py-2">
-                  <span className="text-sm text-slate-600">{t('convEncoder.encodedSequence')}</span>
+                  <span className="text-sm text-slate-600 dark:text-slate-400">{t('convEncoder.encodedSequence')}</span>
                 </div>
                 <div className="bg-slate-50 dark:bg-gray-900 p-2 rounded border border-slate-200 dark:border-gray-600 font-mono text-xs break-all text-slate-700 dark:text-slate-300">
                   {encoded.substring(0, currentStep * generators.length)}
