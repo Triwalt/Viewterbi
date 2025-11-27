@@ -4,6 +4,251 @@
 
 @layer base {
     body {
-        @apply bg-gray-100 dark:bg-gray-900 text-slate-800 dark:text-slate-100 transition-colors duration-300;
+        background-color: #f7fafc; /* bg-gray-100 */
+        color: #2f365f; /* text-slate-800 */
+        transition: color 0.3s, background-color 0.3s;
+    }
+}
+
+/* 暗色模式全局样式 */
+@layer components {
+    /* 白色卡片自动支持暗色模式 */
+    .dark .bg-white {
+        background-color: rgb(31 41 55) !important; /* gray-800 */
+    }
+    
+    /* 浅灰背景 */
+    .dark .bg-gray-50 {
+        background-color: rgba(31, 41, 55, 0.5) !important; /* gray-800/50 */
+    }
+    
+    .dark .bg-gray-100 {
+        background-color: rgb(31 41 55) !important; /* gray-800 */
+    }
+    
+    /* 彩色背景 */
+    .dark .bg-blue-50 {
+        background-color: rgba(30, 58, 138, 0.3) !important; /* blue-900/30 */
+    }
+    
+    .dark .bg-blue-100 {
+        background-color: rgba(30, 58, 138, 0.4) !important;
+    }
+    
+    .dark .bg-green-50 {
+        background-color: rgba(20, 83, 45, 0.3) !important;
+    }
+    
+    .dark .bg-yellow-50 {
+        background-color: rgba(113, 63, 18, 0.3) !important;
+    }
+    
+    .dark .bg-red-50 {
+        background-color: rgba(127, 29, 29, 0.3) !important;
+    }
+    
+    .dark .bg-purple-50 {
+        background-color: rgba(88, 28, 135, 0.3) !important;
+    }
+    
+    /* 文字颜色 */
+    .dark .text-slate-900 {
+        color: rgb(241 245 249) !important; /* slate-100 */
+    }
+    
+    .dark .text-slate-800 {
+        color: rgb(226 232 240) !important; /* slate-200 */
+    }
+    
+    .dark .text-slate-700 {
+        color: rgb(203 213 225) !important; /* slate-300 */
+    }
+    
+    .dark .text-slate-600 {
+        color: rgb(148 163 184) !important; /* slate-400 */
+    }
+    
+    .dark .text-slate-500 {
+        color: rgb(148 163 184) !important;
+    }
+    
+    .dark .text-blue-600 {
+        color: rgb(96 165 250) !important; /* blue-400 */
+    }
+    
+    .dark .text-blue-700 {
+        color: rgb(147 197 253) !important; /* blue-300 */
+    }
+    
+    .dark .text-green-800 {
+        color: rgb(134 239 172) !important; /* green-300 */
+    }
+    
+    .dark .text-green-700 {
+        color: rgb(74 222 128) !important; /* green-400 */
+    }
+    
+    /* 边框颜色 */
+    .dark .border-gray-100 {
+        border-color: rgb(55 65 81) !important; /* gray-700 */
+    }
+    
+    .dark .border-gray-200 {
+        border-color: rgb(55 65 81) !important;
+    }
+    
+    .dark .border-gray-300 {
+        border-color: rgb(75 85 99) !important; /* gray-600 */
+    }
+    
+    .dark .border-blue-100,
+    .dark .border-blue-200 {
+        border-color: rgb(30 58 138) !important; /* blue-800 */
+    }
+    
+    .dark .border-green-200 {
+        border-color: rgb(22 101 52) !important; /* green-800 */
+    }
+    
+    /* Hover状态 */
+    .dark .hover\:bg-gray-100:hover {
+        background-color: rgb(55 65 81) !important;
+    }
+    
+    .dark .hover\:bg-gray-50:hover {
+        background-color: rgba(55, 65, 81, 0.5) !important;
+    }
+    
+    /* 渐变 */
+    .dark .from-blue-50 {
+        --tw-gradient-from: rgba(30, 58, 138, 0.2) !important;
+        --tw-gradient-to: rgba(30, 58, 138, 0) !important;
+        --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
+    }
+    
+    .dark .to-indigo-50 {
+        --tw-gradient-to: rgba(49, 46, 129, 0.2) !important;
+    }
+    
+    /* 输入框 */
+    .dark input[type="text"],
+    .dark input[type="number"],
+    .dark input {
+        background-color: rgb(55 65 81) !important;
+        color: white !important;
+        border-color: rgb(75 85 99) !important;
+    }
+    
+    .dark input:focus {
+        --tw-ring-color: rgb(59 130 246) !important;
+    }
+    
+    /* 理论说明区域 - 渐变背景保持半透明，但内部文字要深色 */
+    .dark .bg-gradient-to-br {
+        background: linear-gradient(to bottom right, rgba(200, 210, 230, 0.15), rgba(180, 200, 230, 0.15)) !important;
+    }
+    
+    .dark .bg-gradient-to-br * {
+        color: rgb(226 232 240) !important; /* slate-200 */
+    }
+    
+    .dark .bg-gradient-to-br h2,
+    .dark .bg-gradient-to-br .font-bold {
+        color: rgb(241 245 249) !important; /* slate-100 */
+    }
+    
+    /* 提示框内的浅色背景 */
+    .dark .bg-white\/70,
+    .dark [class*="bg-white/"] {
+        background-color: rgba(200, 210, 230, 0.2) !important;
+        color: rgb(226 232 240) !important;
+    }
+    
+    /* 表格表头 */
+    .dark .bg-slate-100 {
+        background-color: rgb(55 65 81) !important; /* gray-700 */
+    }
+    
+    .dark thead .text-slate-700,
+    .dark th.text-slate-700 {
+        color: rgb(203 213 225) !important; /* slate-300 */
+    }
+    
+    /* 表格行hover */
+    .dark .hover\:bg-blue-50:hover {
+        background-color: rgba(59, 130, 246, 0.15) !important; /* blue-600/15 */
+    }
+    
+    /* 表格分隔线 */
+    .dark .divide-gray-200 > * + * {
+        border-color: rgb(55 65 81) !important; /* gray-700 */
+    }
+    
+    .dark .border-slate-300 {
+        border-color: rgb(71 85 105) !important; /* slate-600 */
+    }
+    
+    .dark .border-slate-200 {
+        border-color: rgb(71 85 105) !important;
+    }
+    
+    /* 琥珀色提示框 */
+    .dark .bg-amber-50 {
+        background-color: rgba(180, 83, 9, 0.2) !important; /* amber-900/20 */
+    }
+    
+    .dark .border-amber-200 {
+        border-color: rgb(161 98 7) !important; /* amber-700 */
+    }
+    
+    .dark .text-amber-600 {
+        color: rgb(251 191 36) !important; /* amber-400 */
+    }
+    
+    /* 编码步骤表格 */
+    .dark thead.text-gray-500,
+    .dark thead .text-gray-500 {
+        color: rgb(156 163 175) !important; /* gray-400 */
+    }
+    
+    .dark .divide-gray-100 > * + * {
+        border-color: rgb(55 65 81) !important; /* gray-700 */
+    }
+    
+    /* 紫色文字 */
+    .dark .text-purple-600 {
+        color: rgb(192 132 252) !important; /* purple-400 */
+    }
+    
+    /* 只读输入框 */
+    .dark input[readonly] {
+        background-color: rgb(31 41 55) !important; /* gray-800 */
+        color: rgb(203 213 225) !important; /* slate-300 */
+    }
+    
+    /* 滚动条美化 */
+    .dark ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+    
+    .dark ::-webkit-scrollbar-track {
+        background: rgb(31 41 55); /* gray-800 */
+        border-radius: 4px;
+    }
+    
+    .dark ::-webkit-scrollbar-thumb {
+        background: rgb(75 85 99); /* gray-600 */
+        border-radius: 4px;
+    }
+    
+    .dark ::-webkit-scrollbar-thumb:hover {
+        background: rgb(107 114 128); /* gray-500 */
+    }
+    
+    /* Firefox滚动条 */
+    .dark * {
+        scrollbar-width: thin;
+        scrollbar-color: rgb(75 85 99) rgb(31 41 55);
     }
 }

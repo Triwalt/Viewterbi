@@ -34,10 +34,10 @@ function AppContent() {
           <div className="flex items-center justify-between mb-2 md:mb-0">
             <div className="flex items-center gap-2">
               <img src={reactLogo} className="w-5 h-5 md:w-6 md:h-6" alt="React logo" />
-              <span className="font-bold text-sm md:text-base text-blue-800 dark:text-blue-400 hidden sm:inline">
+              <span className="font-bold text-sm md:text-base text-blue-600 dark:text-blue-300 hidden sm:inline">
                 {t('app.title')}
               </span>
-              <span className="font-bold text-xs text-blue-800 dark:text-blue-400 sm:hidden">
+              <span className="font-bold text-xs text-blue-600 dark:text-blue-300 sm:hidden">
                 Viewterbi
               </span>
             </div>

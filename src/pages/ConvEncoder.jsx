@@ -319,47 +319,47 @@ const ConvEncoder = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6 font-sans text-slate-800">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6 font-sans text-slate-800 dark:text-slate-200">
       <div className="max-w-6xl mx-auto space-y-8">
 
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-slate-900 flex items-center gap-3">
-              <Settings className="w-8 h-8 text-blue-600" />
+            <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100 flex items-center gap-3">
+              <Settings className="w-8 h-8 text-blue-600 dark:text-blue-400" />
               {t('convEncoder.title')}
             </h1>
-            <p className="text-slate-500 mt-1">{t('convEncoder.subtitle')}</p>
+            <p className="text-slate-500 dark:text-slate-400 mt-1">{t('convEncoder.subtitle')}</p>
           </div>
 
           {/* Controls */}
-          <div className="flex items-center gap-2 bg-white p-2 rounded-lg shadow-sm border border-gray-200">
-            <button onClick={handleStepBack} disabled={currentStep === 0} className="p-2 hover:bg-gray-100 rounded-md disabled:opacity-50">
+          <div className="flex items-center gap-2 bg-white dark:bg-gray-800 p-2 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+            <button onClick={handleStepBack} disabled={currentStep === 0} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md disabled:opacity-50 dark:text-white">
               <ChevronRight className="w-5 h-5 rotate-180" />
             </button>
             <button onClick={handlePlayPause} className="p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors">
               {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
             </button>
-            <button onClick={handleStepForward} disabled={currentStep === steps.length} className="p-2 hover:bg-gray-100 rounded-md disabled:opacity-50">
+            <button onClick={handleStepForward} disabled={currentStep === steps.length} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md disabled:opacity-50 dark:text-white">
               <ChevronRight className="w-5 h-5" />
             </button>
-            <div className="w-px h-6 bg-gray-300 mx-1" />
-            <button onClick={handleReset} className="p-2 hover:bg-gray-100 rounded-md text-slate-600">
+            <div className="w-px h-6 bg-gray-300 dark:bg-gray-600 mx-1" />
+            <button onClick={handleReset} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md text-slate-600 dark:text-slate-300">
               <RotateCcw className="w-5 h-5" />
             </button>
           </div>
         </div>
 
         {/* Theory Overview */}
-        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-6 shadow-sm">
-          <h2 className="text-lg font-bold text-slate-800 mb-3 flex items-center gap-2">
-            <Info className="w-5 h-5 text-blue-600" />
+        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-6 shadow-sm">
+          <h2 className="text-lg font-bold text-slate-800 dark:text-slate-200 mb-3 flex items-center gap-2">
+            <Info className="w-5 h-5 text-blue-600 dark:text-blue-400" />
             {t('convEncoder.theoryTitle')}
           </h2>
-          <div className="space-y-3 text-sm text-slate-700 leading-relaxed">
+          <div className="space-y-3 text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
             <p>{t('convEncoder.theoryP1')}</p>
             <p>{t('convEncoder.theoryP2')}</p>
-            <p className="bg-white/70 border-l-4 border-blue-400 pl-3 py-2 italic" dangerouslySetInnerHTML={{ __html: t('convEncoder.theoryExample') }} />
+            <p className="bg-white/70 dark:bg-gray-800/70 border-l-4 border-blue-400 dark:border-blue-600 pl-3 py-2 italic" dangerouslySetInnerHTML={{ __html: t('convEncoder.theoryExample') }} />
           </div>
         </div>
 
@@ -369,8 +369,8 @@ const ConvEncoder = () => {
           {/* Left Column: Settings & Info */}
           {/* Left Column: Settings & Info */}
           <div className="space-y-6">
-            <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-200">
-              <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">{t('hardViterbi.configuration')}</h2>
+            <div className="bg-white dark:bg-gray-800 p-5 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+              <h2 className="text-sm font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-4">{t('hardViterbi.configuration')}</h2>
 
               <div className="space-y-4">
                 {/* K is now auto-derived, display it */}
@@ -455,9 +455,9 @@ const ConvEncoder = () => {
                 <div className="flex justify-between items-center py-2">
                   <span className="text-sm text-slate-600">{t('convEncoder.encodedSequence')}</span>
                 </div>
-                <div className="bg-slate-50 p-2 rounded border border-slate-200 font-mono text-xs break-all text-slate-500">
+                <div className="bg-slate-50 dark:bg-gray-900 p-2 rounded border border-slate-200 dark:border-gray-600 font-mono text-xs break-all text-slate-700 dark:text-slate-300">
                   {encoded.substring(0, currentStep * generators.length)}
-                  <span className="text-slate-300">{encoded.substring(currentStep * generators.length)}</span>
+                  <span className="text-slate-300 dark:text-slate-600">{encoded.substring(currentStep * generators.length)}</span>
                 </div>
               </div>
             </div>

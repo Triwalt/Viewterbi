@@ -195,7 +195,7 @@ const ViterbiDecoder = () => {
   const svgHeight = numStates * ySpacing + 50;
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6 font-sans text-slate-800">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6 font-sans text-slate-800 dark:text-slate-200">
       <div className="max-w-6xl mx-auto space-y-8">
 
         {/* Header */}
