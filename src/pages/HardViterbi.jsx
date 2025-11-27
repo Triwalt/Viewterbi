@@ -208,19 +208,19 @@ const ViterbiDecoder = () => {
             <p className="text-slate-500 mt-1">{t('hardViterbi.subtitle')}</p>
           </div>
 
-          {/* Controls */}
-          <div className="flex items-center gap-2 bg-white p-2 rounded-lg shadow-sm border border-gray-200">
-            <button onClick={handleStepBack} disabled={currentStep === 0} className="p-2 hover:bg-gray-100 rounded-md disabled:opacity-50">
+          {/* Controls - Desktop only */}
+          <div className="hidden md:flex items-center gap-2 bg-white dark:bg-gray-800 p-2 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+            <button onClick={handleStepBack} disabled={currentStep === 0} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md disabled:opacity-50 dark:text-white">
               <ChevronRight className="w-5 h-5 rotate-180" />
             </button>
             <button onClick={handlePlayPause} className="p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors">
               {isAutoPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
             </button>
-            <button onClick={handleStepForward} disabled={currentStep === trellisData.length - 1} className="p-2 hover:bg-gray-100 rounded-md disabled:opacity-50">
+            <button onClick={handleStepForward} disabled={currentStep === trellisData.length - 1} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md disabled:opacity-50 dark:text-white">
               <ChevronRight className="w-5 h-5" />
             </button>
-            <div className="w-px h-6 bg-gray-300 mx-1" />
-            <button onClick={handleReset} className="p-2 hover:bg-gray-100 rounded-md text-slate-600">
+            <div className="w-px h-6 bg-gray-300 dark:bg-gray-600 mx-1" />
+            <button onClick={handleReset} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md text-slate-600 dark:text-slate-300">
               <RotateCcw className="w-5 h-5" />
             </button>
           </div>
@@ -246,24 +246,24 @@ const ViterbiDecoder = () => {
 
           {/* Left Column: Configuration */}
           <div className="space-y-6">
-            <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-200">
+            <div className="bg-white dark:bg-gray-800 p-5 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
               <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">{t('hardViterbi.configuration')}</h2>
 
               <div className="space-y-4">
                 {/* K Display */}
-                <div className="bg-blue-50 border border-blue-200 rounded-md p-3">
+                <div className="bg-blue-50 dark:bg-gray-700 border border-blue-200 dark:border-gray-600 rounded-md p-3">
                   <div className="flex justify-between items-center">
                     <span className="text-sm font-medium text-slate-700">{t('hardViterbi.constraintLength')}</span>
-                    <span className="font-mono font-bold text-blue-600 text-lg">{K}</span>
+                    <span className="font-mono font-bold text-blue-600 dark:text-blue-400 text-lg">{K}</span>
                   </div>
-                  <p className="text-xs text-slate-500 mt-1">{t('hardViterbi.autoDerived')}</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{t('hardViterbi.autoDerived')}</p>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">{t('hardViterbi.generators')}</label>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{t('hardViterbi.generators')}</label>
                   <div className="flex gap-2">
                     <input
-                      className="w-24 border border-gray-300 rounded-md px-3 py-2 font-mono text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                      className="w-24 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 font-mono text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 outline-none"
                       value={generators[0]}
                       maxLength={6}
                       onChange={(e) => {
@@ -272,7 +272,7 @@ const ViterbiDecoder = () => {
                       }}
                     />
                     <input
-                      className="w-24 border border-gray-300 rounded-md px-3 py-2 font-mono text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                      className="w-24 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 font-mono text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 outline-none"
                       value={generators[1]}
                       maxLength={6}
                       onChange={(e) => {
@@ -281,44 +281,61 @@ const ViterbiDecoder = () => {
                       }}
                     />
                   </div>
-                  <p className="text-xs text-slate-400 mt-1">{t('hardViterbi.generatorsDefault')}</p>
+                  <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">{t('hardViterbi.generatorsDefault')}</p>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">{t('hardViterbi.inputVector')}</label>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{t('hardViterbi.inputVector')}</label>
                   <input
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 font-mono text-sm tracking-widest focus:ring-2 focus:ring-blue-500 outline-none"
+                    className="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 font-mono text-sm tracking-widest focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 outline-none"
                     value={inputVector}
                     onChange={(e) => {
                       const val = e.target.value.replace(/[^01]/g, '');
                       setInputVector(val);
                     }}
                   />
-                  <p className="text-xs text-slate-400 mt-1">{t('hardViterbi.inputVectorTip')}</p>
+                  <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">{t('hardViterbi.inputVectorTip')}</p>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">{t('hardViterbi.receivedVector')}</label>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{t('hardViterbi.receivedVector')}</label>
                   <input
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 font-mono text-sm tracking-widest focus:ring-2 focus:ring-blue-500 outline-none bg-yellow-50"
+                    className="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 font-mono text-sm tracking-widest focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 outline-none bg-yellow-50 dark:bg-yellow-900"
                     value={receivedVector}
                     onChange={(e) => {
                       const val = e.target.value.replace(/[^01]/g, '');
                       setReceivedVector(val);
                     }}
                   />
-                  <p className="text-xs text-red-500 mt-1">{t('hardViterbi.receivedVectorTip')}</p>
+                  <p className="text-xs text-red-500 dark:text-red-400 mt-1">{t('hardViterbi.receivedVectorTip')}</p>
                 </div>
               </div>
             </div>
 
+            {/* Controls - Mobile only */}
+            <div className="md:hidden flex justify-center items-center gap-2 bg-white dark:bg-gray-800 p-3 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+              <button onClick={handleStepBack} disabled={currentStep === 0} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md disabled:opacity-50 dark:text-white">
+                <ChevronRight className="w-5 h-5 rotate-180" />
+              </button>
+              <button onClick={handlePlayPause} className="p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors">
+                {isAutoPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
+              </button>
+              <button onClick={handleStepForward} disabled={currentStep === trellisData.length - 1} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md disabled:opacity-50 dark:text-white">
+                <ChevronRight className="w-5 h-5" />
+              </button>
+              <div className="w-px h-6 bg-gray-300 dark:bg-gray-600 mx-1" />
+              <button onClick={handleReset} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md text-slate-600 dark:text-slate-300">
+                <RotateCcw className="w-5 h-5" />
+              </button>
+            </div>
+
             {/* Current State */}
-            <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-200">
+            <div className="bg-white dark:bg-gray-800 p-5 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
               <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">{t('hardViterbi.currentState')}</h2>
               <div className="space-y-3">
-                <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                  <span className="text-sm text-slate-600">{t('hardViterbi.timeStep')}</span>
-                  <span className="font-mono font-bold text-slate-900">{currentStep}</span>
+                <div className="flex justify-between items-center py-2 border-b border-gray-100 dark:border-gray-600">
+                  <span className="text-sm text-slate-600 dark:text-slate-300">{t('hardViterbi.timeStep')}</span>
+                  <span className="font-mono font-bold text-slate-900 dark:text-slate-100">{currentStep}</span>
                 </div>
                 {currentStep > 0 && currentStep <= trellisData.length - 1 && (
                   <div className="bg-blue-50 p-3 rounded border border-blue-100">

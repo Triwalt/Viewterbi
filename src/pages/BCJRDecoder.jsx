@@ -361,19 +361,19 @@ const BCJRDecoder = () => {
             <p className="text-slate-500 mt-1">{t('bcjr.subtitle')}</p>
           </div>
 
-          {/* Controls */}
-          <div className="flex items-center gap-2 bg-white p-2 rounded-lg shadow-sm border border-gray-200">
-            <button onClick={handleStepBack} className="p-2 hover:bg-gray-100 rounded-md">
+          {/* Controls - Desktop only */}
+          <div className="hidden md:flex items-center gap-2 bg-white dark:bg-gray-800 p-2 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+            <button onClick={handleStepBack} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md dark:text-white">
               <ChevronLeft className="w-5 h-5" />
             </button>
             <button onClick={handlePlayPause} className="p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors">
               {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
             </button>
-            <button onClick={handleStepForward} className="p-2 hover:bg-gray-100 rounded-md">
+            <button onClick={handleStepForward} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md dark:text-white">
               <ChevronRight className="w-5 h-5" />
             </button>
-            <div className="w-px h-6 bg-gray-300 mx-1" />
-            <button onClick={handleReset} className="p-2 hover:bg-gray-100 rounded-md text-slate-600">
+            <div className="w-px h-6 bg-gray-300 dark:bg-gray-600 mx-1" />
+            <button onClick={handleReset} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md text-slate-600 dark:text-slate-300">
               <RotateCcw className="w-5 h-5" />
             </button>
           </div>
@@ -482,8 +482,25 @@ const BCJRDecoder = () => {
               </div>
             </div>
 
-            <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-200">
-              <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">{t('bcjr.currentStepData')}</h2>
+            {/* Controls - Mobile only */}
+            <div className="md:hidden flex justify-center items-center gap-2 bg-white dark:bg-gray-800 p-3 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+              <button onClick={handleStepBack} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md dark:text-white">
+                <ChevronLeft className="w-5 h-5" />
+              </button>
+              <button onClick={handlePlayPause} className="p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors">
+                {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
+              </button>
+              <button onClick={handleStepForward} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md dark:text-white">
+                <ChevronRight className="w-5 h-5" />
+              </button>
+              <div className="w-px h-6 bg-gray-300 dark:bg-gray-600 mx-1" />
+              <button onClick={handleReset} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md text-slate-600 dark:text-slate-300">
+                <RotateCcw className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="bg-white dark:bg-gray-800 p-5 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+              <h2 className="text-sm font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-4">{t('bcjr.currentStepData')}</h2>
               <div className="space-y-2 font-mono text-sm">
                 <div className="flex justify-between">
                   <span className="text-slate-500">{t('bcjr.time')}</span>

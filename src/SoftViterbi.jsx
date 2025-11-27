@@ -222,19 +222,19 @@ const SoftViterbi = () => {
             <p className="text-slate-500 mt-1">{t('softViterbi.subtitle')}</p>
           </div>
 
-          {/* Controls */}
-          <div className="flex items-center gap-2 bg-white p-2 rounded-lg shadow-sm border border-gray-200">
-            <button onClick={handleStepBack} disabled={currentStep === 0} className="p-2 hover:bg-gray-100 rounded-md disabled:opacity-50">
+          {/* Controls - Desktop only */}
+          <div className="hidden md:flex items-center gap-2 bg-white dark:bg-gray-800 p-2 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+            <button onClick={handleStepBack} disabled={currentStep === 0} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md disabled:opacity-50 dark:text-white">
               <ChevronRight className="w-5 h-5 rotate-180" />
             </button>
             <button onClick={handlePlayPause} className="p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors">
               {isAutoPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
             </button>
-            <button onClick={handleStepForward} disabled={currentStep === trellisData.length - 1} className="p-2 hover:bg-gray-100 rounded-md disabled:opacity-50">
+            <button onClick={handleStepForward} disabled={currentStep === trellisData.length - 1} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md disabled:opacity-50 dark:text-white">
               <ChevronRight className="w-5 h-5" />
             </button>
-            <div className="w-px h-6 bg-gray-300 mx-1" />
-            <button onClick={handleReset} className="p-2 hover:bg-gray-100 rounded-md text-slate-600">
+            <div className="w-px h-6 bg-gray-300 dark:bg-gray-600 mx-1" />
+            <button onClick={handleReset} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md text-slate-600 dark:text-slate-300">
               <RotateCcw className="w-5 h-5" />
             </button>
           </div>
@@ -345,8 +345,25 @@ const SoftViterbi = () => {
               </div>
             </div>
 
+            {/* Controls - Mobile only */}
+            <div className="md:hidden flex justify-center items-center gap-2 bg-white dark:bg-gray-800 p-3 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+              <button onClick={handleStepBack} disabled={currentStep === 0} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md disabled:opacity-50 dark:text-white">
+                <ChevronRight className="w-5 h-5 rotate-180" />
+              </button>
+              <button onClick={handlePlayPause} className="p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors">
+                {isAutoPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
+              </button>
+              <button onClick={handleStepForward} disabled={currentStep === trellisData.length - 1} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md disabled:opacity-50 dark:text-white">
+                <ChevronRight className="w-5 h-5" />
+              </button>
+              <div className="w-px h-6 bg-gray-300 dark:bg-gray-600 mx-1" />
+              <button onClick={handleReset} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md text-slate-600 dark:text-slate-300">
+                <RotateCcw className="w-5 h-5" />
+              </button>
+            </div>
+
             {/* Current State */}
-            <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-200">
+            <div className="bg-white dark:bg-gray-800 p-5 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
               <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">{t('hardViterbi.currentState')}</h2>
               <div className="space-y-3">
                 <div className="flex justify-between items-center py-2 border-b border-gray-100">
