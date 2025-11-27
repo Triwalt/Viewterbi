@@ -457,6 +457,26 @@ const translations = {
     llrNegative: {
       zh: 'LLR < 0 (决策为0)',
       en: 'LLR < 0 (Decision: 0)'
+    },
+    flowcharts: {
+      zh: 'BCJR 算法流程图',
+      en: 'BCJR Algorithm Flowcharts'
+    },
+    overallProcess: {
+      zh: '总体流程',
+      en: 'Overall Process'
+    },
+    forwardProcess: {
+      zh: '前向递归 (α过程)',
+      en: 'Forward Recursion (α Process)'
+    },
+    backwardProcess: {
+      zh: '后向递归 (β过程)',
+      en: 'Backward Recursion (β Process)'
+    },
+    llrProcess: {
+      zh: 'LLR 计算过程',
+      en: 'LLR Calculation Process'
     }
   },
 

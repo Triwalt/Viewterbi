@@ -1,6 +1,10 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { Settings, Play, Pause, RotateCcw, ChevronRight, ChevronLeft, Info, ArrowRight, ArrowLeft, Calculator } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
+import bcjrGenImg from '../assets/bcjk_gen.png';
+import forwImg from '../assets/forw.png';
+import backwImg from '../assets/backw.png';
+import llrImg from '../assets/llr.png';
 
 const LOG_ZERO = -1e9;
 
@@ -13,12 +17,12 @@ const logAdd = (a, b) => {
 
 const BCJRDecoder = () => {
   const { t } = useLanguage();
-  
+
   // --- Configuration ---
   const [generators, setGenerators] = useState(["111", "101"]);
   const [inputVector, setInputVector] = useState("110100");
   const [receivedVector, setReceivedVector] = useState("");
-  
+
   // Adaptive K (matching Viterbi pages)
   const K = useMemo(() => Math.min(6, Math.max(2, ...generators.map(g => g.length))), [generators]);
   const numStates = Math.pow(2, K - 1);
@@ -62,7 +66,7 @@ const BCJRDecoder = () => {
     };
 
     const n = Math.floor(receivedVector.length / symbolsPerBit);
-    
+
     if (n === 0) {
       return { n: 0, alpha: [], beta: [], llrs: [], decisions: [] };
     }
@@ -412,7 +416,7 @@ const BCJRDecoder = () => {
           {/* Left Column: Settings */}
           <div className="space-y-6">
             <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-200">
-              <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">{t('bcjr.configuration')}</h2>
+              <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">{t('hardViterbi.configuration')}</h2>
               <div className="space-y-4">
                 {/* K Display */}
                 <div className="bg-purple-50 border border-purple-200 rounded-md p-3">
@@ -550,6 +554,63 @@ const BCJRDecoder = () => {
           </div>
 
         </div>
+
+        {/* BCJR Algorithm Flowcharts */}
+        <div className="mt-8 space-y-6">
+          <h2 className="text-2xl font-bold text-slate-800 flex items-center gap-2">
+            <Calculator className="w-6 h-6 text-purple-600" />
+            {t('bcjr.flowcharts')}
+          </h2>
+
+          {/* Overall Process */}
+          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+            <h3 className="text-lg font-semibold text-slate-700 mb-4">{t('bcjr.overallProcess')}</h3>
+            <div className="flex justify-center">
+              <img
+                src={bcjrGenImg}
+                alt="BCJR Overall Process"
+                className="max-w-full h-auto rounded-lg border border-gray-200 shadow-sm"
+              />
+            </div>
+          </div>
+
+          {/* Forward (Alpha) Process */}
+          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+            <h3 className="text-lg font-semibold text-slate-700 mb-4">{t('bcjr.forwardProcess')}</h3>
+            <div className="flex justify-center">
+              <img
+                src={forwImg}
+                alt="Forward Alpha Process"
+                className="max-w-full h-auto rounded-lg border border-gray-200 shadow-sm"
+              />
+            </div>
+          </div>
+
+          {/* Backward (Beta) Process */}
+          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+            <h3 className="text-lg font-semibold text-slate-700 mb-4">{t('bcjr.backwardProcess')}</h3>
+            <div className="flex justify-center">
+              <img
+                src={backwImg}
+                alt="Backward Beta Process"
+                className="max-w-full h-auto rounded-lg border border-gray-200 shadow-sm"
+              />
+            </div>
+          </div>
+
+          {/* LLR Calculation Process */}
+          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+            <h3 className="text-lg font-semibold text-slate-700 mb-4">{t('bcjr.llrProcess')}</h3>
+            <div className="flex justify-center">
+              <img
+                src={llrImg}
+                alt="LLR Calculation Process"
+                className="max-w-full h-auto rounded-lg border border-gray-200 shadow-sm"
+              />
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
   );

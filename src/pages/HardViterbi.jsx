@@ -495,7 +495,7 @@ const ViterbiDecoder = () => {
           <div className="flex justify-center">
             <img
               src={hardFlow}
-              alt={t('hardViterbi.flowAlt')}
+              alt={t('hardViterbi.flowTitle')}
               className="w-full max-w-5xl h-auto rounded-md shadow border border-gray-200"
             />
           </div>

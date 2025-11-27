@@ -4,7 +4,7 @@ import { useLanguage } from '../contexts/LanguageContext';
 
 const ConvEncoder = () => {
   const { t } = useLanguage();
-  
+
   // --- Configuration State ---
   const [generators, setGenerators] = useState(["111", "101"]);
   const [inputVector, setInputVector] = useState("110100");
@@ -154,7 +154,7 @@ const ConvEncoder = () => {
               <text x={cellWidth / 2} y={cellHeight / 2 + 5} textAnchor="middle" className="fill-white font-mono font-bold text-xl">
                 {currentStep < steps.length ? steps[currentStep].input : '-'}
               </text>
-              <text x={cellWidth / 2} y={-10} textAnchor="middle" className="fill-slate-400 text-xs">Input</text>
+              <text x={cellWidth / 2} y={-10} textAnchor="middle" className="fill-slate-400 text-xs">{t('convEncoder.inputBit')}</text>
             </g>
 
             {/* Connection Input -> First Cell */}
@@ -239,7 +239,7 @@ const ConvEncoder = () => {
 
         {/* Generator Info Overlay */}
         <div className="absolute top-4 right-4 text-right">
-          <div className="text-xs text-slate-500">Generators: {generators.join(', ')}</div>
+          <div className="text-xs text-slate-500">{t('convEncoder.generatorsBinary')}: {generators.join(', ')}</div>
         </div>
       </div>
     );
@@ -366,6 +366,7 @@ const ConvEncoder = () => {
         {/* Main Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
+          {/* Left Column: Settings & Info */}
           {/* Left Column: Settings & Info */}
           <div className="space-y-6">
             <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-200">
@@ -502,6 +503,7 @@ const ConvEncoder = () => {
             </div>
 
           </div>
+
         </div>
 
         {/* Optimal Generators Reference */}

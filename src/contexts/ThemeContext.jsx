@@ -46,12 +46,13 @@ export const ThemeProvider = ({ children }) => {
     }
   }, [themeMode, isDark]);
 
-  // Cycle through: auto -> light -> dark -> auto
+  // Toggle between light and dark
   const toggleTheme = () => {
     setThemeMode((prev) => {
-      if (prev === 'auto') return 'light';
-      if (prev === 'light') return 'dark';
-      return 'auto';
+      if (prev === 'auto') {
+        return systemPrefersDark ? 'light' : 'dark';
+      }
+      return prev === 'dark' ? 'light' : 'dark';
     });
   };
 
