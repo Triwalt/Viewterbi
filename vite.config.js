@@ -4,7 +4,7 @@ import react from '@vitejs/plugin-react'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
-  // ⚠️ 注意：这里的 '/viterbi-viz/' 必须换成您在 GitHub 上的仓库名称
-  // 例如您的仓库是 https://github.com/user/my-app，这里就填 '/my-app/'
-  base: 'https://triwalt.github.io/Viewterbi/', 
+  // 根据环境变量设置 base 路径
+  // Vercel 使用 '/'，GitHub Pages 使用仓库路径
+  base: process.env.VERCEL_ENV ? '/' : 'https://triwalt.github.io/Viewterbi/',
 })
