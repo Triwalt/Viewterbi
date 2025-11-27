@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
-import reactLogo from './assets/react.svg'
 import './App.css'
+import logoUrl from '/logo.svg'
 import { Languages, Moon, Sun } from 'lucide-react'
 import { LanguageProvider, useLanguage } from './contexts/LanguageContext'
 import { ThemeProvider, useTheme } from './contexts/ThemeContext'
@@ -33,7 +33,7 @@ function AppContent() {
           {/* 顶部行：Logo + 工具按钮 */}
           <div className="flex items-center justify-between mb-2 md:mb-0">
             <div className="flex items-center gap-2">
-              <img src={reactLogo} className="w-5 h-5 md:w-6 md:h-6" alt="React logo" />
+              <img src={logoUrl} className="w-5 h-5 md:w-6 md:h-6" alt="Viewterbi logo" />
               <span className="font-bold text-sm md:text-base text-blue-600 dark:text-blue-300 hidden sm:inline">
                 {t('app.title')}
               </span>
