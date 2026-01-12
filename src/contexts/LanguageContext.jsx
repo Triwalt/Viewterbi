@@ -503,12 +503,12 @@ const translations = {
       en: 'Tail-biting convolutional codes overcome the rate loss of traditional zero-terminated codes by forcing the starting and ending states of the encoder to be identical. This achieves block coding while maintaining the original code rate.'
     },
     theoryP2: {
-      zh: '**编码过程：** 将编码器的初始状态初始化为信息序列的最后 K-1 个比特。这样，当整个序列输入完成后，寄存器的状态自然回到初始设定，满足咬尾特性。',
-      en: '**Encoding:** The initial state of the encoder is pre-loaded with the last K-1 bits of the information sequence. Thus, after the entire sequence is processed, the encoder state naturally returns to the initial state.'
+      zh: '编码过程：将编码器的初始状态初始化为信息序列的最后 K-1 个比特。这样，当整个序列输入完成后，寄存器的状态自然回到初始设定，满足咬尾特性。',
+      en: 'Encoding: The initial state of the encoder is pre-loaded with the last K-1 bits of the information sequence. Thus, after the entire sequence is processed, the encoder state naturally returns to the initial state.'
     },
     theoryP3: {
-      zh: '**译码过程 (WAVA)：** 环绕维特比算法（Wrap-Around Viterbi）常用于译码。由于起始状态未知且与结束状态相同，算法会将一帧末尾的路径度量作为下一轮迭代的起始度量，进行多次迭代（通常2-3次）以收敛。',
-      en: '**Decoding (WAVA):** The Wrap-Around Viterbi Algorithm is used for decoding. Since the starting state is unknown but identical to the ending state, the path metrics from the end of a frame are used as initial metrics for the next iteration of the same frame.'
+      zh: '译码过程 (WAVA)：环绕维特比算法（Wrap-Around Viterbi）常用于译码。由于起始状态未知且与结束状态相同，算法会将一帧末尾的路径度量作为下一轮迭代的起始度量，进行多次迭代（通常2-3次）以收敛。',
+      en: 'Decoding (WAVA): The Wrap-Around Viterbi Algorithm is used for decoding. Since the starting state is unknown but identical to the ending state, the path metrics from the end of a frame are used as initial metrics for the next iteration of the same frame.'
     },
     theoryTip: {
       zh: '💡 提示：观察编码结束后的寄存器状态，它必须与初始状态（由信息末尾比特决定）完全一致。',

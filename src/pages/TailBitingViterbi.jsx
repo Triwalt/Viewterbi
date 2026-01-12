@@ -49,7 +49,7 @@ const TailBitingViterbi = () => {
   // --- Encoding Logic (TBCC) ---
   const encodingResult = useMemo(() => {
     const bits = sanitizeBits(inputVector);
-    if (bits.length < K - 1) return { steps: [], encoded: "", initialState: 0, endState: 0 };
+    if (bits.length < K - 1) return { steps: [], encoded: "", initialState: 0, endState: 0, isMatched: false };
 
     // TBCC Rule: Initial state = last (K-1) bits
     const lastBits = bits.slice(-(K - 1));
@@ -105,7 +105,7 @@ const TailBitingViterbi = () => {
 
   // --- Decoding Logic (WAVA) ---
   const decodingResult = useMemo(() => {
-    if (!receivedVector) return { trellis: [], decoded: "", finalPath: [] };
+    if (!receivedVector) return { allLayers: [], decoded: "", finalPath: [], bestEndState: -1 };
     
     const n = receivedVector.length / generators.length;
     let currentPm = Array(numStates).fill(0); // All states equal chance at start
@@ -182,11 +182,24 @@ const TailBitingViterbi = () => {
       .map(p => p.input)
       .join("");
 
+    // Circularity check: The state at t=0 of the last iteration should match its end state
+    const lastIterPath = finalPath.filter(p => p.iter === iterations - 1);
+    let isCircular = false;
+    if (lastIterPath.length > 0 && n > 0) {
+      const firstNodeOfLastIter = lastIterPath[0];
+      const layerIdx = (iterations - 1) * n + firstNodeOfLastIter.t;
+      if (allLayers[layerIdx] && allLayers[layerIdx].nodes[firstNodeOfLastIter.state]?.survivor) {
+        const startStateOfLastIter = allLayers[layerIdx].nodes[firstNodeOfLastIter.state].survivor.from;
+        isCircular = startStateOfLastIter === bestEndState;
+      }
+    }
+
     return { 
       allLayers, 
       decoded: decodedBits, 
       finalPath,
-      bestEndState
+      bestEndState,
+      isCircular
     };
   }, [receivedVector, generators, iterations, numStates, K]);
 
@@ -222,7 +235,7 @@ const TailBitingViterbi = () => {
     const xSpacing = 50;
     const ySpacing = 40;
     const paddingX = 60;
-    const n = inputVector.length;
+    const n = inputVector.length || 1;
     
     // We only show one full cycle (N steps) for the trellis, but maybe multiple iterations sidebar-style?
     // Let's show all iterations horizontally but grouped.
@@ -233,6 +246,19 @@ const TailBitingViterbi = () => {
     return (
       <div className="overflow-x-auto pb-4">
         <svg width={width} height={height} className="mx-auto">
+          {/* State Labels (Vertical Axis) */}
+          {Array.from({ length: numStates }).map((_, s) => (
+            <text
+              key={`state-label-${s}`}
+              x={paddingX - 10}
+              y={40 + s * ySpacing + 4}
+              textAnchor="end"
+              className="text-[10px] font-mono fill-slate-500"
+            >
+              {s.toString(2).padStart(K - 1, '0')}
+            </text>
+          ))}
+
           {/* Grids and nodes */}
           {Array.from({ length: layersToShow.length + 1 }).map((_, i) => {
             const isBoundVal = i % n === 0;
@@ -426,13 +452,26 @@ const TailBitingViterbi = () => {
             
             {/* Encoding Steps */}
             <div className="bg-white dark:bg-gray-800 p-5 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
-               <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Encoding Trace</h3>
+               <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest">Encoding Trace</h3>
+                  <div className="flex items-center gap-4 text-[10px] text-slate-400">
+                    <div className="flex items-center gap-1"><div className="w-2 h-2 bg-slate-200 rounded border border-slate-300"></div> {t('convEncoder.state')}</div>
+                    <div className="flex items-center gap-1"><div className="w-2 h-2 bg-indigo-600 rounded"></div> {t('convEncoder.inputBit')}</div>
+                    <div className="flex items-center gap-1"><div className="font-mono text-slate-500 underline decoration-indigo-400">XY</div> {t('convEncoder.outputBits')}</div>
+                  </div>
+               </div>
                <div className="flex flex-wrap gap-2">
                   {encodingResult.steps.map((s, idx) => (
                     <div key={idx} className={`flex flex-col items-center p-2 rounded border transition-all ${idx < currentStep ? 'bg-indigo-50 border-indigo-200 border-b-4' : 'opacity-40'}`}>
-                      <span className="text-[10px] text-slate-400 font-mono">t={idx}</span>
+                      <div className="w-full flex justify-between items-center mb-1 px-1">
+                        <span className="text-[9px] text-slate-400 font-mono">t={idx}</span>
+                        <span className="text-[9px] font-mono text-slate-500 bg-slate-100 dark:bg-gray-700 px-1 rounded">S:{s.prevState.toString(2).padStart(K-1, '0')}</span>
+                      </div>
                       <span className="text-lg font-bold text-indigo-600">{s.input}</span>
-                      <span className="text-[10px] text-slate-500 font-mono">{s.outBits}</span>
+                      <div className="w-full flex flex-col items-center mt-1 pt-0.5 border-t border-indigo-100">
+                        <span className="text-[10px] text-slate-500 font-mono leading-none tracking-tighter">{s.outBits}</span>
+                        <span className="text-[8px] text-slate-300 font-sans uppercase transform scale-90">Out</span>
+                      </div>
                     </div>
                   ))}
                </div>
@@ -466,9 +505,14 @@ const TailBitingViterbi = () => {
                <div className={`p-5 rounded-xl border transition-colors ${decodingResult.decoded === inputVector ? 'bg-green-900/10 border-green-500/50' : 'bg-red-900/10 border-red-500/50'}`}>
                   <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Decoding Result</h3>
                   <div className="space-y-4">
-                    <div>
-                      <div className="text-[10px] text-slate-500 mb-1 uppercase">Decoded Bits (WAVA)</div>
-                      <div className={`font-mono text-xl tracking-widest ${decodingResult.decoded === inputVector ? 'text-green-500' : 'text-red-500'}`}>{decodingResult.decoded || "Decoding..."}</div>
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <div className="text-[10px] text-slate-500 mb-1 uppercase">Decoded Bits (WAVA)</div>
+                        <div className={`font-mono text-xl tracking-widest ${decodingResult.decoded === inputVector ? 'text-green-500' : 'text-red-500'}`}>{decodingResult.decoded || "Decoding..."}</div>
+                      </div>
+                      <div className={`px-2 py-1 rounded text-[10px] font-bold uppercase ${decodingResult.isCircular ? 'bg-green-500/20 text-green-400 border border-green-500/30' : 'bg-orange-500/20 text-orange-400 border border-orange-500/30'}`}>
+                        {decodingResult.isCircular ? "Circular Matched" : "Non-Circular"}
+                      </div>
                     </div>
                     <div className="flex gap-4">
                        <div>
@@ -477,7 +521,11 @@ const TailBitingViterbi = () => {
                        </div>
                        <div>
                           <div className="text-[10px] text-slate-500 mb-1 uppercase">Final PM</div>
-                          <div className="text-lg font-bold font-mono text-indigo-500">{decodingResult.bestEndState !== -1 ? decodingResult.allLayers[decodingResult.allLayers.length -1].pm[decodingResult.bestEndState] : "-"}</div>
+                          <div className="text-lg font-bold font-mono text-indigo-500">
+                            {decodingResult.bestEndState !== -1 && decodingResult.allLayers.length > 0 
+                              ? decodingResult.allLayers[decodingResult.allLayers.length - 1].pm[decodingResult.bestEndState] 
+                              : "-"}
+                          </div>
                        </div>
                     </div>
                   </div>
