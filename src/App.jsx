@@ -12,6 +12,7 @@ import HardViterbi from './pages/HardViterbi'
 import SoftViterbi from './SoftViterbi'
 import ConvEncoder from './pages/ConvEncoder'
 import BCJRDecoder from './pages/BCJRDecoder'
+import TailBitingViterbi from './pages/TailBitingViterbi'
 
 function AppContent() {
   const [mode, setMode] = useState('encoder')
@@ -122,6 +123,16 @@ function AppContent() {
             >
               {t('app.bcjrDecoder')}
             </button>
+            <button
+              className={`px-2.5 py-1 md:px-3 md:py-1.5 rounded-full border text-xs md:text-sm whitespace-nowrap transition-colors flex-shrink-0 ${
+                mode === 'tbcc' 
+                  ? 'bg-blue-600 text-white border-blue-600' 
+                  : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600'
+              }`}
+              onClick={() => setMode('tbcc')}
+            >
+              {t('app.tbcc')}
+            </button>
           </div>
         </div>
       </div>
@@ -138,6 +149,9 @@ function AppContent() {
         )}
         {mode === 'bcjr' && (
           <BCJRDecoder />
+        )}
+        {mode === 'tbcc' && (
+          <TailBitingViterbi />
         )}
       </div>
       

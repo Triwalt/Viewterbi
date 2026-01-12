@@ -25,6 +25,10 @@ const translations = {
     bcjrDecoder: {
       zh: 'BCJR Decoder',
       en: 'BCJR Decoder'
+    },
+    tbcc: {
+      zh: 'TBCC (咬尾码)',
+      en: 'TBCC'
     }
   },
 
@@ -477,6 +481,70 @@ const translations = {
     llrProcess: {
       zh: 'LLR 计算过程',
       en: 'LLR Calculation Process'
+    }
+  },
+
+  // TBCC
+  tbcc: {
+    title: {
+      zh: '咬尾卷积码 (TBCC)',
+      en: 'Tail-biting Convolutional Codes'
+    },
+    subtitle: {
+      zh: '克服速率损失的圆环卷积码编码与 WAVA 译码可视化',
+      en: 'Circular convolutional encoding and WAVA decoding visualization'
+    },
+    theoryTitle: {
+      zh: '咬尾卷积码 (TBCC) 原理',
+      en: 'Tail-biting Convolutional Code (TBCC) Theory'
+    },
+    theoryP1: {
+      zh: '咬尾卷积码（Tail-biting CC）通过使编码器的起始状态与结束状态相同，克服了传统零尾（Zero-Termination）卷积码需要插入尾比特导致的速率损失。它在保持码率的同时，实现了对分组数据的块编码。',
+      en: 'Tail-biting convolutional codes overcome the rate loss of traditional zero-terminated codes by forcing the starting and ending states of the encoder to be identical. This achieves block coding while maintaining the original code rate.'
+    },
+    theoryP2: {
+      zh: '**编码过程：** 将编码器的初始状态初始化为信息序列的最后 K-1 个比特。这样，当整个序列输入完成后，寄存器的状态自然回到初始设定，满足咬尾特性。',
+      en: '**Encoding:** The initial state of the encoder is pre-loaded with the last K-1 bits of the information sequence. Thus, after the entire sequence is processed, the encoder state naturally returns to the initial state.'
+    },
+    theoryP3: {
+      zh: '**译码过程 (WAVA)：** 环绕维特比算法（Wrap-Around Viterbi）常用于译码。由于起始状态未知且与结束状态相同，算法会将一帧末尾的路径度量作为下一轮迭代的起始度量，进行多次迭代（通常2-3次）以收敛。',
+      en: '**Decoding (WAVA):** The Wrap-Around Viterbi Algorithm is used for decoding. Since the starting state is unknown but identical to the ending state, the path metrics from the end of a frame are used as initial metrics for the next iteration of the same frame.'
+    },
+    theoryTip: {
+      zh: '💡 提示：观察编码结束后的寄存器状态，它必须与初始状态（由信息末尾比特决定）完全一致。',
+      en: '💡 Tip: Observe the final register state after encoding; it must match the initial state (determined by the last bits).'
+    },
+    initialState: {
+      zh: '初始状态 (Pre-load)',
+      en: 'Initial State (Pre-load)'
+    },
+    endState: {
+      zh: '结束状态',
+      en: 'End State'
+    },
+    tailBitingMatch: {
+      zh: '咬尾匹配性',
+      en: 'Tail-biting Match'
+    },
+    matched: {
+      zh: '已匹配',
+      en: 'Matched'
+    },
+    iteration: {
+      zh: '迭代轮次',
+      en: 'Iteration'
+    },
+    wavaIteration: {
+      zh: 'WAVA 迭代',
+      en: 'WAVA Iteration'
+    },
+    iterNote: {
+      zh: '注：WAVA通过多次遍历同一帧数据使状态度量收敛',
+      en: 'Note: WAVA iterates over the same frame to converge metrics'
+    },
+    circularTrellis: {
+      zh: 'Circular Trellis (WAVA)',
+      en: 'Circular Trellis (WAVA)'
     }
   },
 
